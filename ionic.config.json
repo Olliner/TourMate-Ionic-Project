@@ -1,0 +1,7 @@
+{
+  "name": "TourMate",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
