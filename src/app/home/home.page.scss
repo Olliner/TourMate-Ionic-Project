@@ -1,6 +1,8 @@
+* {
+  font-family: Poppins, sans-serif;
+}
 #container {
   text-align: center;
-
   position: absolute;
   left: 0;
   right: 0;
@@ -26,9 +28,83 @@
   text-decoration: none;
 }
 
-.custom-button-success {
-  --background: #28a745; 
-  --color: #ffffff; 
-  --border: 1px solid #28a745; 
+.entrar {
+  --background: #28a745;
+  --color: #ffffff;
+  --border: 1px solid #28a745;
 }
+ion-header {
+  box-shadow: none;
 
+  ion-toolbar {
+    padding-top: 2rem;
+    }
+
+    ion-buttons {
+      ion-img {
+        height: 90px;
+        width: 90px;
+      }
+    }
+  }
+
+ion-content {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  padding: 0; // Remover padding padrão para ajustar o layout conforme necessário
+
+  form {
+    width: 100%;
+    max-width: 500px;
+
+    ion-item {
+      --border-color: transparent;
+      --box-shadow: none;
+
+      ion-label {
+        position: floating;
+        font-family: Poppins, sans-serif;
+        font-weight: 700;
+      }
+
+      ion-input {
+        margin-top: 2rem;
+        padding: 10px;
+        border-radius: 15px;
+        border: 1px solid #038920;
+        background-color: #e5e5e5;
+      }
+    }
+
+    // Botões dentro do formulário
+    > div {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+
+      ion-button {
+        flex: 1;
+        &.danger {
+          margin-right: 4rem;
+        }
+
+        &.custom-button-success {
+          margin-left: 4rem;
+        }
+      }
+    }
+
+    // Link "Esqueceu Senha?"
+    > div:last-child {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+  }
+
+  ion-img {
+    margin-top: 1.5rem;
+    width: 190px;
+  }
+}

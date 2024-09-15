@@ -1,0 +1,32 @@
+<ion-header [translucent]="true" style="box-shadow: none;">
+<ion-img src="/assets/images/Logo (1).png"alt="Logo Tourmate">
+</ion-img>
+</ion-header>
+
+<ion-content>
+  <form (ngSubmit)="register()" padding>
+    <ion-item>
+      <ion-label position="floating">Nome</ion-label>
+      <ion-input type="text" [(ngModel)]="nome" name="nome" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">E-mail</ion-label>
+      <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Senha</ion-label>
+      <ion-input type="password" [(ngModel)]="senha" name="senha" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Confirmar senha</ion-label>
+      <ion-input type="password" [(ngModel)]="confirmarSenha" name="confirmarSenha" required></ion-input>
+    </ion-item>
+
+    <div>
+      <ion-button type="submit">Finalizar</ion-button>
+    </div>
+  </form>
+</ion-content>

@@ -1,0 +1,15 @@
+ion-toolbar {
+    --background: #EA4949 !important;
+  }
+  .menu-content {
+    background-color: #d9d9d9; /* Cor de fundo do conteúdo do menu */
+  }
+  
+  .menu-item {
+    --background: transparent; /* Garante que o fundo dos itens esteja transparente por padrão */
+  }
+  
+  .menu-item:hover {
+    background-color: #d9d9d9; /* Aplica o fundo cinza ao passar o mouse */
+  }
+  

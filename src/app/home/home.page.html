@@ -1,48 +1,34 @@
-<ion-header [translucent]="true" style="box-shadow: none">
-  <ion-toolbar style="padding-top: 3rem">
-    <ion-title color="dark" style="font-size: 36px; font-weight: 700"
-      >Olá, Viajante</ion-title>
-    <ion-title color="medium" style="font-size: 24px; font-weight: 500"
-      >Bem-vindo</ion-title>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title color="dark" style="font-size: 36px; font-weight: 700;">Olá, Viajante</ion-title>
+    <ion-title color="medium" style="font-size: 24px;font-weight: 500;">Bem-vindo</ion-title>
     <ion-buttons slot="end">
-      <ion-img
-        src="/assets/images/titlemap.png"
-        alt="Logo maps"
-        style="height: 90px; width: 90px"
-      ></ion-img>
+      <ion-img src="/assets/images/titlemap.png" alt="Logo maps"></ion-img>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content
-  padding
-  style="display: flex; justify-content: center; height: 100%">
-  <form style="width: 100%; max-width: 500px; margin-top: 5rem">
-    <ion-item style="--border-color: transparent; --box-shadow: none;" >
+<ion-content>
+  <form (ngSubmit)="login()">
+    <ion-item>
       <ion-label position="floating">Nome</ion-label>
-      <ion-input type="text" style="margin-top: 2rem; padding: 10px; border-radius: 15px; border: 1px solid #038920;background-color: #e5e5e5;"></ion-input>
+      <ion-input type="text" [(ngModel)]="nome" name="nome" required></ion-input>
     </ion-item>
 
-    <ion-item style="--border-color: transparent; --box-shadow: none;">
+    <ion-item>
       <ion-label position="floating">Senha</ion-label>
-      <ion-input type="password" style="margin-top: 2rem; padding: 10px; border-radius: 15px; border: 1px solid #038920;background-color: #e5e5e5;"></ion-input>
-
+      <ion-input type="password" [(ngModel)]="senha" name="senha" required></ion-input>
     </ion-item>
 
-    <div
-      style="display: flex; justify-content: space-between; margin-top: 2rem">
-      <ion-button color="danger" style="flex: 1; margin-right: 4rem">Cadastro</ion-button>
-      <ion-button class="custom-button-success" style="flex: 1; margin-left: 4rem;">Entrar</ion-button>
+    <div>
+      <ion-button color="danger" routerLink="/register">Cadastro</ion-button>
+      <ion-button class="entrar" type="submit">Entrar</ion-button>
     </div>
 
-    <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <div>
       <ion-router-link routerLink="/caminho"> Esqueceu Senha? </ion-router-link>
     </div>
   </form>
 
-  <ion-img
-    src="/assets/images/Logo.png"
-    alt="Logo Tourmate"
-    style="height: 364px; width: 376px;">
-  </ion-img>
+  <ion-img src="/assets/images/Logo.png" alt="Logo Tourmate"> </ion-img>
 </ion-content>
