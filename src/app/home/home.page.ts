@@ -10,6 +10,7 @@ import { NavController } from '@ionic/angular';
 export class HomePage {
   nome: string = '';
   senha: string = '';
+
   constructor(private apiService: ApiService, private navCtrl: NavController) {}
 
   login() {
@@ -17,10 +18,16 @@ export class HomePage {
       nome: this.nome,
       senha: this.senha
     };
+
     this.apiService.login(credentials).subscribe(
-      (response) => {
+      (response: any) => {
         console.log('Login realizado com sucesso', response);
-        this.navCtrl.navigateForward('/dashboard');
+        
+        // Armazena o nome do usuário no localStorage para utilizar em outras partes da aplicação
+        localStorage.setItem('username', response.nome);
+        
+        // Navega para a página de index (ou outra página após o login)
+        this.navCtrl.navigateForward('/index');
       },
       (error) => {
         console.error('Erro ao realizar login', error);
@@ -28,5 +35,4 @@ export class HomePage {
       }
     );
   }
-  
 }

@@ -19,4 +19,14 @@ export class ApiService {
   login(credentials: { nome: string; senha: string; }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials);
   }
+
+  // Função para obter avaliações de um local
+  getEvaluations(location: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/evaluations?location=${encodeURIComponent(location)}`);
+  }
+
+  // Função para enviar uma avaliação
+  submitEvaluation(evaluation: { location: string; comment: string; rating: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/evaluations`, evaluation);
+  }
 }
