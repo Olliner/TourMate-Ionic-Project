@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://127.0.0.1:5000';  // Substitua pelo endereço da sua API
+  private apiUrl = 'https://crudtourmate-2717319c3c8e.herokuapp.com';  // Substitua pelo endereço da sua API
 
   constructor(private http: HttpClient) {}
 
@@ -16,7 +16,7 @@ export class ApiService {
   }
 
   // Função para realizar o login
-  login(credentials: { nome: string; senha: string; }): Observable<any> {
+  login(nome: string, senha: string, credentials: { nome: string; senha: string; }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials);
   }
 

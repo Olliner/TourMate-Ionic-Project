@@ -14,24 +14,28 @@ export class HomePage {
   constructor(private apiService: ApiService, private navCtrl: NavController) {}
 
   login() {
+    // Cria o objeto de credenciais conforme esperado pelo ApiService
     const credentials = {
       nome: this.nome,
       senha: this.senha
     };
 
-    this.apiService.login(credentials).subscribe(
+    // Chama o método de login do ApiService com três parâmetros
+    this.apiService.login(this.nome, this.senha, credentials).subscribe(
       (response: any) => {
-        console.log('Login realizado com sucesso', response);
-        
-        // Armazena o nome do usuário no localStorage para utilizar em outras partes da aplicação
+        // Exibe um alerta de sucesso
+        alert('Sucesso!');
+
+        // Armazena o nome do usuário no localStorage
         localStorage.setItem('username', response.nome);
-        
-        // Navega para a página de index (ou outra página após o login)
+
+        // Redireciona para a página de index
         this.navCtrl.navigateForward('/index');
       },
       (error) => {
+        // Exibe erro no console e alerta de falha no login
         console.error('Erro ao realizar login', error);
-        alert('Falha ao fazer login. Verifique suas credenciais.');
+        alert('Falha no login! Verifique suas credenciais.');
       }
     );
   }

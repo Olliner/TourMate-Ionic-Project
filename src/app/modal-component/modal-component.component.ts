@@ -12,7 +12,7 @@ import { of } from 'rxjs';
 export class ModalComponentComponent implements OnInit {
   comment: string = ''; 
   rating: number | null = null; 
-  apiUrl: string = 'http://127.0.0.1:5000/comentarios'; // URL da API
+  apiUrl: string = 'https://crudtourmate-2717319c3c8e.herokuapp.com/comentarios'; // URL da API
   comentarios: any[] = []; // Array para armazenar os comentários
 
   constructor(
