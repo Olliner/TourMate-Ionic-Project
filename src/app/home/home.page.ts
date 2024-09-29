@@ -20,14 +20,15 @@ export class HomePage {
       senha: this.senha
     };
 
-    // Chama o método de login do ApiService com três parâmetros
-    this.apiService.login(this.nome, this.senha, credentials).subscribe(
+    // Chama o método de login do ApiService com dois parâmetros
+    this.apiService.login(this.nome, this.senha).subscribe(
       (response: any) => {
         // Exibe um alerta de sucesso
         alert('Sucesso!');
 
         // Armazena o nome do usuário no localStorage
         localStorage.setItem('username', response.nome);
+        localStorage.setItem('userId', response.id); // Armazene o ID do usuário, se disponível
 
         // Redireciona para a página de index
         this.navCtrl.navigateForward('/index');

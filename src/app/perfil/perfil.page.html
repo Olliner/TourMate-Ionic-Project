@@ -1,0 +1,98 @@
+<ion-menu contentId="main-content" style="width: 50%">
+  <ion-content class="ion-padding menu-content">
+    <ion-avatar>
+      <img alt="Silhouette of a person's head" src="/assets/images/avatar.png" />
+    </ion-avatar>
+    <h5 class="user-name">{{ apiUsername }}</h5> <!-- Alterado para usar apiUsername -->
+
+    <ion-item routerLink="/index" class="menu-item">
+      <h4>Principal</h4>
+    </ion-item>
+    <ion-item routerLink="/perfil" class="menu-item">
+      <h4>Perfil</h4>
+    </ion-item>
+    <ion-item routerLink="/compartilhar" class="menu-item">
+      <h4>Compartilhar</h4>
+    </ion-item>
+    <ion-item routerLink="/mapa" class="menu-item">
+      <h4>Mapa</h4>
+    </ion-item>
+    <ion-item (click)="logout()" class="menu-item logout-item">
+      <h4>Sair</h4>
+    </ion-item>
+    <ion-img src="/assets/images/iconemenu.png" alt="tomate" class="menu-icon"></ion-img>
+  </ion-content>
+</ion-menu>
+
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button class="menu-button"></ion-menu-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <div style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
+      <ion-title class="welcome-title">PERFIL</ion-title>
+      <ion-avatar style="margin: 2rem 0 1rem; width: 120px; height: 120px;">
+        <img alt="Silhouette of a person's head" src="/assets/images/avatar.png" />
+      </ion-avatar>
+      <ion-title class="sub-title">{{ apiUsername }}</ion-title>
+    </div>
+
+    <ion-card (click)="toggleInfo()" button>
+      <ion-card-header>
+        <ion-card-title>Informações</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <div *ngIf="showInfo" style="padding: 1rem; text-align: center;">
+      <ion-item style="--padding-start: 0; --padding-end: 0;">
+        <ion-label>Email</ion-label>
+        <ion-note slot="end" style="max-width: 50%;">{{ apiEmail }}</ion-note>
+      </ion-item>
+      <ion-item style="--padding-start: 0; --padding-end: 0;">
+        <ion-label>Nome de Usuário</ion-label>
+        <ion-note slot="end" style="max-width: 50%;">{{ apiUsername }}</ion-note>
+      </ion-item>
+      <ion-item style="--padding-start: 0; --padding-end: 0;">
+        <ion-label>Senha</ion-label>
+        <ion-note slot="end" style="max-width: 50%;">**********</ion-note>
+      </ion-item>
+    </div>
+
+    <ion-card (click)="toggleAlt()" button>
+      <ion-card-header>
+        <ion-card-title>Alteração</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <div *ngIf="showAlt" style="padding: 1rem; text-align: center;">
+      <form (ngSubmit)="onSubmit()">
+        <ion-item>
+          <ion-label position="floating">Novo Email</ion-label>
+          <ion-input type="email" [(ngModel)]="newEmail" name="newEmail" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Nova Senha</ion-label>
+          <ion-input type="password" [(ngModel)]="newPassword" name="newPassword" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Confirme a Nova Senha</ion-label>
+          <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
+        </ion-item>
+        
+        <ion-button expand="full" type="submit">Atualizar</ion-button>
+      </form>
+    </div>
+
+    <ion-card (click)="toggleAva()" button>
+      <ion-card-header>
+        <ion-card-title>Avaliações</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+    
+  </ion-content>
+</div>
