@@ -19,19 +19,19 @@ interface Evaluation {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://crudtourmate-2717319c3c8e.herokuapp.com'; // URL da sua API
+  private apiUrl = 'http://127.0.0.1:5000'; // URL da sua API
 
   constructor(private http: HttpClient) {}
 
   // Função para realizar o cadastro
   register(userData: User): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${this.apiUrl}/users/register`, userData);
   }
 
   // Função para realizar o login
   login(nome: string, senha: string): Observable<any> {
     const credentials = { nome, senha };
-    return this.http.post(`${this.apiUrl}/login`, credentials);
+    return this.http.post(`${this.apiUrl}/users/login`, credentials);
   }
 
   // Função para obter avaliações de um local
@@ -46,11 +46,21 @@ export class ApiService {
 
   // Função para recuperar os dados do usuário logado
   getUserProfile(userId: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/user/${userId}`); // Endpoint para obter o perfil do usuário
+    return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
   }
 
   // Função para atualizar os dados do usuário
   updateUserProfile(username: string, userData: { email: string; senha: string }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/user/${username}`, userData); // Endpoint para atualizar o perfil do usuário
+    return this.http.put(`${this.apiUrl}/users/${username}`, userData);
+  }
+
+  // Função para verificar o email do usuário
+  verificarEmail(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users/verify-email`, { email });
+  }
+
+  // Função para redefinir a senha
+  redefinirSenha(email: string, novaSenha: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { email, novaSenha });
   }
 }

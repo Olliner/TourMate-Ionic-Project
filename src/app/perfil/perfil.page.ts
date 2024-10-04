@@ -54,6 +54,7 @@ export class PerfilPage implements OnInit {
       console.log('Os dados do usuário não correspondem aos armazenados.');
     }
   }
+  
 
   toggleInfo() {
     this.showInfo = !this.showInfo;
@@ -97,6 +98,6 @@ export class PerfilPage implements OnInit {
     localStorage.removeItem('email');
     localStorage.removeItem('password');
     localStorage.removeItem('userId');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

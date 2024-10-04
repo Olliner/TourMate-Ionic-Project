@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title color="dark" style="font-size: 36px; font-weight: 700;">Olá, Viajante</ion-title>
-    <ion-title color="medium" style="font-size: 24px;font-weight: 500;">Bem-vindo</ion-title>
+    <ion-title color="medium" style="font-size: 24px; font-weight: 500;">Bem-vindo</ion-title>
     <ion-buttons slot="end">
       <ion-img src="/assets/images/titlemap.png" alt="Logo maps"></ion-img>
     </ion-buttons>
@@ -25,12 +25,52 @@
       <ion-button class="entrar" type="submit">Entrar</ion-button>
     </div>
 
-    <div>
-      <ion-router-link routerLink="/caminho" style="width: 100%;display: flex;justify-content: center;"> Esqueceu Senha? </ion-router-link>
-    </div>
+    <a (click)="openForgotPasswordModal()" style="width: 100%; display: flex; justify-content: center;">
+      Esqueceu Senha?
+    </a>
   </form>
 
   <div style="display: flex;">
     <img src="/assets/images/Logo.png" alt="Logo Tourmate">
   </div>
+
+  <!-- Modal de redefinição de senha -->
+  <ion-modal [isOpen]="isForgotPasswordModalOpen" (willDismiss)="closeForgotPasswordModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Redefinir Senha</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeForgotPasswordModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <!-- Formulário de verificação de e-mail -->
+        <form (ngSubmit)="submitForgotPassword()">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+          </ion-item>
+
+          <ion-button type="submit" expand="block">Confirmar Email</ion-button>
+        </form>
+
+        <!-- Campos de nova senha aparecerão após a confirmação do email -->
+        <form *ngIf="emailConfirmed" (ngSubmit)="resetPassword()">
+          <ion-item>
+            <ion-label position="floating">Nova Senha</ion-label>
+            <ion-input type="password" [(ngModel)]="newPassword" name="newPassword" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Confirmar Senha</ion-label>
+            <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
+          </ion-item>
+
+          <ion-button type="submit" expand="block">Redefinir Senha</ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
