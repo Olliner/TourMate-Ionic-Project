@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title color="dark" style="font-size: 36px; font-weight: 700;">Olá, Viajante</ion-title>
-    <ion-title color="medium" style="font-size: 24px;font-weight: 500;">Bem-vindo</ion-title>
+    <ion-title color="medium" style="font-size: 24px; font-weight: 500;">Bem-vindo</ion-title>
     <ion-buttons slot="end">
       <ion-img src="/assets/images/titlemap.png" alt="Logo maps"></ion-img>
     </ion-buttons>
@@ -25,12 +25,85 @@
       <ion-button class="entrar" type="submit">Entrar</ion-button>
     </div>
 
-    <div>
-      <ion-router-link routerLink="/caminho" style="width: 100%;display: flex;justify-content: center;"> Esqueceu Senha? </ion-router-link>
-    </div>
+    <a (click)="openForgotPasswordModal()" style="width: 100%; display: flex; justify-content: center;">
+      Esqueceu Senha?
+    </a>
   </form>
 
   <div style="display: flex;">
     <img src="/assets/images/Logo.png" alt="Logo Tourmate">
   </div>
+
+  <!-- Modal de redefinição de senha -->
+  <ion-modal [isOpen]="isForgotPasswordModalOpen" (willDismiss)="closeForgotPasswordModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Redefinir Senha</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeForgotPasswordModal()">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <!-- Formulário de verificação de e-mail -->
+        <form (ngSubmit)="submitForgotPassword()" #emailForm="ngForm">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input 
+              type="email" 
+              [(ngModel)]="email" 
+              name="email" 
+              required 
+              email 
+              #emailInput="ngModel">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="emailInput.invalid && emailInput.touched">
+            <p *ngIf="emailInput.errors?.['required']">O campo e-mail é obrigatório.</p>
+            <p *ngIf="emailInput.errors?.['email']">Por favor, insira um e-mail válido.</p>
+          </div>
+          <ion-button type="submit" expand="block" [disabled]="emailForm.invalid">Confirmar Email</ion-button>
+        </form>
+      
+        <!-- Campos de nova senha aparecerão após a confirmação do email -->
+        <form *ngIf="emailConfirmed" (ngSubmit)="resetPassword()" #passwordForm="ngForm">
+          <ion-item>
+            <ion-label position="floating">Nova Senha</ion-label>
+            <ion-input 
+              type="password" 
+              [(ngModel)]="newPassword" 
+              name="newPassword" 
+              required 
+              minlength="6" 
+              #newPasswordInput="ngModel">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="newPasswordInput.invalid && newPasswordInput.touched">
+            <p *ngIf="newPasswordInput.errors?.['required']">O campo de nova senha é obrigatório.</p>
+            <p *ngIf="newPasswordInput.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</p>
+          </div>
+      
+          <ion-item>
+            <ion-label position="floating">Confirmar Senha</ion-label>
+            <ion-input 
+              type="password" 
+              [(ngModel)]="confirmPassword" 
+              name="confirmPassword" 
+              required 
+              #confirmPasswordInput="ngModel">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="confirmPassword !== newPassword && confirmPasswordInput.touched">
+            <p>As senhas não coincidem.</p>
+          </div>
+      
+          <ion-button type="submit" expand="block" [disabled]="passwordForm.invalid || confirmPassword !== newPassword">
+            Redefinir Senha
+          </ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

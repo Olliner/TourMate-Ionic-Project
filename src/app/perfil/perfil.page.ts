@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastController, LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-perfil',
@@ -17,77 +18,111 @@ export class PerfilPage implements OnInit {
   newPassword: string = '';
   confirmPassword: string = '';
   showInfo: boolean = false;
-  showAlt: boolean = false;
+  showAltEmail: boolean = false;
+  showAltSenha: boolean = false;
   showAva: boolean = false;
 
-  constructor(private apiService: ApiService, private router: Router) {}
+  constructor(
+    private apiService: ApiService,
+    private router: Router,
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController
+  ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.username = localStorage.getItem('username') || 'Usuário';
-    this.loadUserProfile();
+    await this.loadUserProfile();
   }
 
-  loadUserProfile() {
-    if (this.username) {
-      this.apiService.getUserProfile(this.username).subscribe(
-        (data: { nome: string; email: string; senha: string }) => {
-          this.apiUsername = data.nome;
-          this.apiEmail = data.email;
-          this.apiPassword = data.senha;
-          this.compareUserData();
-        },
-        (error: HttpErrorResponse) => {
-          console.error('Erro ao carregar o perfil do usuário:', error);
-          alert('Não foi possível carregar o perfil do usuário.');
-        }
-      );
-    }
+  async presentToast(message: string, duration: number = 2000) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: duration,
+      position: 'bottom',
+    });
+    toast.present();
   }
 
-  compareUserData() {
-    const storedEmail = localStorage.getItem('email');
-    const storedPassword = localStorage.getItem('password');
+  async presentLoading(message: string) {
+    const loading = await this.loadingCtrl.create({
+      message: message,
+      spinner: 'crescent',
+    });
+    await loading.present();
+    return loading;
+  }
 
-    if (this.apiUsername === this.username && this.apiEmail === storedEmail && this.apiPassword === storedPassword) {
-      console.log('Usuário validado com sucesso!');
-    } else {
-      console.log('Os dados do usuário não correspondem aos armazenados.');
-    }
+  async loadUserProfile() {
+    const loading = await this.presentLoading('Carregando perfil...');
+    this.apiService.getUserProfile(this.username).subscribe(
+      (data: { nome: string; email: string; senha: string }) => {
+        loading.dismiss();
+        this.apiUsername = data.nome;
+        this.apiEmail = data.email;
+        this.apiPassword = data.senha;
+      },
+      (error: HttpErrorResponse) => {
+        loading.dismiss();
+        console.error('Erro ao carregar o perfil do usuário:', error);
+        this.presentToast('Erro ao carregar perfil.');
+      }
+    );
   }
 
   toggleInfo() {
     this.showInfo = !this.showInfo;
   }
 
-  toggleAlt() {
-    this.showAlt = !this.showAlt;
+  toggleAltEmail() {
+    this.showAltEmail = !this.showAltEmail;
   }
+
+  toggleAltSenha() {
+    this.showAltSenha = !this.showAltSenha;
+  }
+
   toggleAva() {
     this.showAva = !this.showAva;
   }
 
-  onSubmit() {
-    // Validar se as senhas novas coincidem
+  async onSubmitEmail() {
+    const loading = await this.presentLoading('Atualizando email...');
+    this.apiService.updateUserProfile(this.username, { email: this.newEmail }).subscribe(
+      () => {
+        loading.dismiss();
+        this.presentToast('Email atualizado com sucesso!');
+        this.loadUserProfile();
+        this.newEmail = '';
+        this.showAltEmail = false;
+      },
+      (error: HttpErrorResponse) => {
+        loading.dismiss();
+        console.error('Erro ao atualizar email:', error);
+        this.presentToast('Erro ao atualizar email.');
+      }
+    );
+  }
+
+  async onSubmitSenha() {
     if (this.newPassword !== this.confirmPassword) {
-      alert('As senhas não coincidem.');
+      this.presentToast('As senhas não coincidem.');
       return;
     }
 
-    // Chamar o serviço para atualizar o perfil
-    this.apiService.updateUserProfile(this.username, { email: this.newEmail, senha: this.newPassword }).subscribe(
+    const loading = await this.presentLoading('Atualizando senha...');
+    this.apiService.updateUserProfile(this.username, { senha: this.newPassword }).subscribe(
       () => {
-        alert('Perfil atualizado com sucesso!');
-        this.loadUserProfile(); // Recarregar o perfil para mostrar as novas informações
-        this.showAlt = false; // Ocultar a seção de alteração
-
-        // Limpar os campos após a atualização
-        this.newEmail = '';
+        loading.dismiss();
+        this.presentToast('Senha atualizada com sucesso!');
+        this.loadUserProfile();
         this.newPassword = '';
         this.confirmPassword = '';
+        this.showAltSenha = false;
       },
       (error: HttpErrorResponse) => {
-        console.error('Erro ao atualizar o perfil do usuário:', error);
-        alert('Não foi possível atualizar o perfil do usuário.');
+        loading.dismiss();
+        console.error('Erro ao atualizar senha:', error);
+        this.presentToast('Erro ao atualizar senha.');
       }
     );
   }
@@ -97,6 +132,6 @@ export class PerfilPage implements OnInit {
     localStorage.removeItem('email');
     localStorage.removeItem('password');
     localStorage.removeItem('userId');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }
