@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { NavController, ModalController } from '@ionic/angular';
+import { NavController, ModalController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -19,8 +19,19 @@ export class HomePage {
   constructor(
     private apiService: ApiService, 
     private navCtrl: NavController, 
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private toastCtrl: ToastController // Adicionando o ToastController para feedback do usuário
   ) {}
+
+  // Função para exibir uma mensagem Toast
+  async presentToast(message: string, duration: number = 2000) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: duration,
+      position: 'bottom'
+    });
+    toast.present();
+  }
 
   // Função de login
   login() {
@@ -31,14 +42,14 @@ export class HomePage {
 
     this.apiService.login(this.nome, this.senha).subscribe(
       (response: any) => {
-        alert('Login bem-sucedido!');
+        this.presentToast('Login bem-sucedido!');
         localStorage.setItem('username', response.nome);
         localStorage.setItem('userId', response.id);
         this.navCtrl.navigateForward('/index');
       },
       (error) => {
         console.error('Erro ao realizar login', error);
-        alert('Falha no login! Verifique suas credenciais.');
+        this.presentToast('Falha no login! Verifique suas credenciais.');
       }
     );
   }
@@ -66,14 +77,14 @@ export class HomePage {
         console.log('Resposta da verificação:', response);
         if (response.message === "E-mail verificado com sucesso!") {
           this.emailConfirmed = true; // Se o email foi confirmado, habilita os campos de nova senha
-          alert('Email confirmado! Agora você pode redefinir sua senha.');
+          this.presentToast('Email confirmado! Agora você pode redefinir sua senha.');
         } else {
-          alert('Email não encontrado');
+          this.presentToast('Email não encontrado');
         }
       },
       (error) => {
         console.error('Erro ao verificar email', error);
-        alert('Erro ao verificar email.');
+        this.presentToast('Erro ao verificar email.');
       }
     );
   }
@@ -81,30 +92,36 @@ export class HomePage {
   // Função para redefinir a senha
   resetPassword() {
     if (this.newPassword !== this.confirmPassword) {
-      alert('As senhas não coincidem!');
+      this.presentToast('As senhas não coincidem!');
+      return;
+    }
+
+    // Validação adicional da força da senha (exemplo simples)
+    if (this.newPassword.length < 6) {
+      this.presentToast('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
     // Chamada para redefinir a senha
-    this.apiService.redefinirSenha(this.email, this.newPassword).subscribe(
+    this.apiService.redefinirSenha(this.email, this.newPassword, this.confirmPassword).subscribe(
       (response: any) => {
         // Ajuste para verificar a resposta da API
         if (response.message === "Senha redefinida com sucesso!") {
-          alert('Senha redefinida com sucesso!');
+          this.presentToast('Senha redefinida com sucesso!');
           this.closeForgotPasswordModal(); // Fecha o modal após redefinir a senha
         } else {
-          alert('Erro ao redefinir senha: ' + response.message);
+          this.presentToast('Erro ao redefinir senha: ' + response.message);
         }
       },
       (error) => {
         console.error('Erro ao redefinir senha', error);
         // Adiciona uma mensagem de erro mais detalhada
         if (error.error && error.error.message) {
-          alert('Erro ao redefinir senha: ' + error.error.message);
+          this.presentToast('Erro ao redefinir senha: ' + error.error.message);
         } else {
-          alert('Erro ao redefinir senha.');
+          this.presentToast('Erro ao redefinir senha.');
         }
       }
     );
   }
-}
+} 

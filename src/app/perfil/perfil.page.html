@@ -3,7 +3,7 @@
     <ion-avatar>
       <img alt="Silhouette of a person's head" src="/assets/images/avatar.png" />
     </ion-avatar>
-    <h5 class="user-name">{{ apiUsername }}</h5> <!-- Alterado para usar apiUsername -->
+    <h5 class="user-name">{{ apiUsername }}</h5>
 
     <ion-item routerLink="/index" class="menu-item">
       <h4>Principal</h4>
@@ -63,18 +63,32 @@
       </ion-item>
     </div>
 
-    <ion-card (click)="toggleAlt()" button>
+    <!-- Alteração de Email -->
+    <ion-card (click)="toggleAltEmail()" button>
       <ion-card-header>
-        <ion-card-title>Alteração</ion-card-title>
+        <ion-card-title>Alterar Email</ion-card-title>
       </ion-card-header>
     </ion-card>
 
-    <div *ngIf="showAlt" style="padding: 1rem; text-align: center;">
-      <form (ngSubmit)="onSubmit()">
+    <div *ngIf="showAltEmail" style="padding: 1rem; text-align: center;">
+      <form (ngSubmit)="onSubmitEmail()">
         <ion-item>
           <ion-label position="floating">Novo Email</ion-label>
           <ion-input type="email" [(ngModel)]="newEmail" name="newEmail" required></ion-input>
         </ion-item>
+        <ion-button expand="full" type="submit">Atualizar Email</ion-button>
+      </form>
+    </div>
+
+    <!-- Alteração de Senha -->
+    <ion-card (click)="toggleAltSenha()" button>
+      <ion-card-header>
+        <ion-card-title>Alterar Senha</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <div *ngIf="showAltSenha" style="padding: 1rem; text-align: center;">
+      <form (ngSubmit)="onSubmitSenha()">
         <ion-item>
           <ion-label position="floating">Nova Senha</ion-label>
           <ion-input type="password" [(ngModel)]="newPassword" name="newPassword" required></ion-input>
@@ -83,8 +97,7 @@
           <ion-label position="floating">Confirme a Nova Senha</ion-label>
           <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
         </ion-item>
-        
-        <ion-button expand="full" type="submit">Atualizar</ion-button>
+        <ion-button expand="full" type="submit">Atualizar Senha</ion-button>
       </form>
     </div>
 

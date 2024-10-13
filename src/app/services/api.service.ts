@@ -19,7 +19,7 @@ interface Evaluation {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://127.0.0.1:5000'; // URL da sua API
+  private apiUrl = 'https://crudtourmate-2717319c3c8e.herokuapp.com'; // Removi o espaço extra no final
 
   constructor(private http: HttpClient) {}
 
@@ -50,9 +50,9 @@ export class ApiService {
   }
 
   // Função para atualizar os dados do usuário
-  updateUserProfile(username: string, userData: { email: string; senha: string }): Observable<any> {
+  updateUserProfile(username: string, userData: Partial<{ email: string; senha: string }>): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/${username}`, userData);
-  }
+  }  
 
   // Função para verificar o email do usuário
   verificarEmail(email: string): Observable<any> {
@@ -60,7 +60,11 @@ export class ApiService {
   }
 
   // Função para redefinir a senha
-  redefinirSenha(email: string, novaSenha: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reset-password`, { email, novaSenha });
+  redefinirSenha(email: string, novaSenha: string, confirmacaoSenha: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, {
+      email: email,
+      nova_senha: novaSenha,
+      confirmacao_senha: confirmacaoSenha
+    });
   }
 }
