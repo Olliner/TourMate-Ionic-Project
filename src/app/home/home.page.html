@@ -47,61 +47,37 @@
       </ion-header>
 
       <ion-content>
-        <!-- Formulário de verificação de e-mail -->
-        <form (ngSubmit)="submitForgotPassword()" #emailForm="ngForm">
+        <!-- Formulário para enviar e-mail -->
+        <form *ngIf="passwordResetState === PasswordResetState.RequestEmail" (ngSubmit)="submitForgotPassword()">
           <ion-item>
             <ion-label position="floating">Email</ion-label>
-            <ion-input 
-              type="email" 
-              [(ngModel)]="email" 
-              name="email" 
-              required 
-              email 
-              #emailInput="ngModel">
-            </ion-input>
+            <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
           </ion-item>
-          <div *ngIf="emailInput.invalid && emailInput.touched">
-            <p *ngIf="emailInput.errors?.['required']">O campo e-mail é obrigatório.</p>
-            <p *ngIf="emailInput.errors?.['email']">Por favor, insira um e-mail válido.</p>
-          </div>
-          <ion-button type="submit" expand="block" [disabled]="emailForm.invalid">Confirmar Email</ion-button>
+          <ion-button type="submit" expand="block">Confirmar Email</ion-button>
         </form>
-      
-        <!-- Campos de nova senha aparecerão após a confirmação do email -->
-        <form *ngIf="emailConfirmed" (ngSubmit)="resetPassword()" #passwordForm="ngForm">
+
+        <!-- Formulário para inserir o token e a nova senha -->
+        <form *ngIf="passwordResetState === PasswordResetState.ConfirmToken" (ngSubmit)="confirmToken()" #tokenForm="ngForm">
+          <ion-item>
+            <ion-label position="floating">Token</ion-label>
+            <ion-input type="text" [(ngModel)]="token" name="token" required></ion-input>
+          </ion-item>
+          <ion-button type="submit" expand="block" [disabled]="tokenForm.invalid">Confirmar Token</ion-button>
+        </form>
+
+        <!-- Campos de nova senha após confirmar o token -->
+        <form *ngIf="passwordResetState === PasswordResetState.ResetPassword" (ngSubmit)="resetPassword()">
           <ion-item>
             <ion-label position="floating">Nova Senha</ion-label>
-            <ion-input 
-              type="password" 
-              [(ngModel)]="newPassword" 
-              name="newPassword" 
-              required 
-              minlength="6" 
-              #newPasswordInput="ngModel">
-            </ion-input>
+            <ion-input type="password" [(ngModel)]="newPassword" name="newPassword" required minlength="6"></ion-input>
           </ion-item>
-          <div *ngIf="newPasswordInput.invalid && newPasswordInput.touched">
-            <p *ngIf="newPasswordInput.errors?.['required']">O campo de nova senha é obrigatório.</p>
-            <p *ngIf="newPasswordInput.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</p>
-          </div>
-      
+
           <ion-item>
             <ion-label position="floating">Confirmar Senha</ion-label>
-            <ion-input 
-              type="password" 
-              [(ngModel)]="confirmPassword" 
-              name="confirmPassword" 
-              required 
-              #confirmPasswordInput="ngModel">
-            </ion-input>
+            <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
           </ion-item>
-          <div *ngIf="confirmPassword !== newPassword && confirmPasswordInput.touched">
-            <p>As senhas não coincidem.</p>
-          </div>
-      
-          <ion-button type="submit" expand="block" [disabled]="passwordForm.invalid || confirmPassword !== newPassword">
-            Redefinir Senha
-          </ion-button>
+
+          <ion-button type="submit" expand="block">Redefinir Senha</ion-button>
         </form>
       </ion-content>
     </ng-template>

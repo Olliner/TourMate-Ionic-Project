@@ -10,10 +10,9 @@ import { ToastController, LoadingController } from '@ionic/angular';
   styleUrls: ['./perfil.page.scss'],
 })
 export class PerfilPage implements OnInit {
-  username: string = '';
+  userId: string = '';
   apiUsername: string = '';
   apiEmail: string = '';
-  apiPassword: string = '';
   newEmail: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
@@ -21,6 +20,7 @@ export class PerfilPage implements OnInit {
   showAltEmail: boolean = false;
   showAltSenha: boolean = false;
   showAva: boolean = false;
+  avatarUrl: string = '/assets/images/avatar.png';
 
   constructor(
     private apiService: ApiService,
@@ -30,7 +30,12 @@ export class PerfilPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.username = localStorage.getItem('username') || 'Usuário';
+    this.userId = localStorage.getItem('userId') || '';
+    if (!this.userId) {
+      this.presentToast('Por favor, faça login novamente.');
+      this.router.navigate(['/login']);
+      return;
+    }
     await this.loadUserProfile();
   }
 
@@ -54,20 +59,32 @@ export class PerfilPage implements OnInit {
 
   async loadUserProfile() {
     const loading = await this.presentLoading('Carregando perfil...');
-    this.apiService.getUserProfile(this.username).subscribe(
-      (data: { nome: string; email: string; senha: string }) => {
+    this.apiService.getUserProfile(this.userId).subscribe(
+      (data) => {
         loading.dismiss();
         this.apiUsername = data.nome;
         this.apiEmail = data.email;
-        this.apiPassword = data.senha;
+  
+        // Chama o serviço para pegar o avatar do usuário
+        this.apiService.getUserAvatar(this.userId).subscribe(
+          (avatarUrl) => {
+            // Verifica se a URL do avatar é válida
+            this.avatarUrl = avatarUrl ? `${avatarUrl}?t=${new Date().getTime()}` : '/assets/images/avatar.png';
+          },
+          (error) => {
+            console.error('Erro ao carregar avatar:', error);
+            this.avatarUrl = '/assets/images/avatar.png'; // Avatar padrão em caso de erro
+          }
+        );
       },
       (error: HttpErrorResponse) => {
         loading.dismiss();
-        console.error('Erro ao carregar o perfil do usuário:', error);
+        console.error('Erro ao carregar perfil do usuário:', error);
         this.presentToast('Erro ao carregar perfil.');
       }
     );
   }
+  
 
   toggleInfo() {
     this.showInfo = !this.showInfo;
@@ -85,9 +102,46 @@ export class PerfilPage implements OnInit {
     this.showAva = !this.showAva;
   }
 
+  async selectAvatar() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (file) {
+        const loading = await this.presentLoading('Atualizando avatar...');
+        this.apiService.uploadAvatar(this.userId, file).subscribe(
+          (response: any) => {  // Altere o tipo para `any` ou o tipo correto da resposta
+            loading.dismiss();
+  
+            if (response && response.avatar_url) {
+              // Atualiza a URL do avatar diretamente com a URL retornada pela API
+              this.avatarUrl = `${response.avatar_url}?t=${new Date().getTime()}`;
+              console.log('URL do avatar após atualização:', this.avatarUrl);
+              this.presentToast('Avatar atualizado com sucesso!');
+              // Atualiza o avatar através do método getUserAvatar
+              this.loadUserProfile();  // Recarrega o perfil e o avatar
+            } else {
+              console.error('URL do avatar retornada está vazia ou indefinida');
+              this.presentToast('Erro ao atualizar avatar.');
+            }
+          },
+          (error: HttpErrorResponse) => {
+            loading.dismiss();
+            console.error('Erro ao atualizar avatar:', error);
+            this.presentToast('Erro ao atualizar avatar.');
+          }
+        );
+      }
+    };
+    input.click();
+  }
+  
+
+
   async onSubmitEmail() {
     const loading = await this.presentLoading('Atualizando email...');
-    this.apiService.updateUserProfile(this.username, { email: this.newEmail }).subscribe(
+    this.apiService.updateUserProfile(this.userId, { email: this.newEmail }).subscribe(
       () => {
         loading.dismiss();
         this.presentToast('Email atualizado com sucesso!');
@@ -110,7 +164,7 @@ export class PerfilPage implements OnInit {
     }
 
     const loading = await this.presentLoading('Atualizando senha...');
-    this.apiService.updateUserProfile(this.username, { senha: this.newPassword }).subscribe(
+    this.apiService.updateUserProfile(this.userId, { senha: this.newPassword }).subscribe(
       () => {
         loading.dismiss();
         this.presentToast('Senha atualizada com sucesso!');
@@ -128,10 +182,7 @@ export class PerfilPage implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    localStorage.removeItem('password');
     localStorage.removeItem('userId');
     this.router.navigate(['/home']);
   }
-}
+}  

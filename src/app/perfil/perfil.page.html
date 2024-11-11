@@ -1,29 +1,3 @@
-<ion-menu contentId="main-content" style="width: 50%">
-  <ion-content class="ion-padding menu-content">
-    <ion-avatar>
-      <img alt="Silhouette of a person's head" src="/assets/images/avatar.png" />
-    </ion-avatar>
-    <h5 class="user-name">{{ apiUsername }}</h5>
-
-    <ion-item routerLink="/index" class="menu-item">
-      <h4>Principal</h4>
-    </ion-item>
-    <ion-item routerLink="/perfil" class="menu-item">
-      <h4>Perfil</h4>
-    </ion-item>
-    <ion-item routerLink="/compartilhar" class="menu-item">
-      <h4>Compartilhar</h4>
-    </ion-item>
-    <ion-item routerLink="/mapa" class="menu-item">
-      <h4>Mapa</h4>
-    </ion-item>
-    <ion-item (click)="logout()" class="menu-item logout-item">
-      <h4>Sair</h4>
-    </ion-item>
-    <ion-img src="/assets/images/iconemenu.png" alt="tomate" class="menu-icon"></ion-img>
-  </ion-content>
-</ion-menu>
-
 <div class="ion-page" id="main-content">
   <ion-header>
     <ion-toolbar>
@@ -36,9 +10,9 @@
   <ion-content class="ion-padding">
     <div style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
       <ion-title class="welcome-title">PERFIL</ion-title>
-      <ion-avatar style="margin: 2rem 0 1rem; width: 120px; height: 120px;">
-        <img alt="Silhouette of a person's head" src="/assets/images/avatar.png" />
-      </ion-avatar>
+      <ion-avatar style="margin: 2rem 0 1rem; width: 120px; height: 120px;" (click)="selectAvatar()">
+        <img alt="Silhouette of a person's head" [src]="avatarUrl || '/assets/images/avatar.png'" />
+      </ion-avatar>      
       <ion-title class="sub-title">{{ apiUsername }}</ion-title>
     </div>
 
@@ -76,7 +50,7 @@
           <ion-label position="floating">Novo Email</ion-label>
           <ion-input type="email" [(ngModel)]="newEmail" name="newEmail" required></ion-input>
         </ion-item>
-        <ion-button expand="full" type="submit">Atualizar Email</ion-button>
+        <ion-button expand="full" type="submit" color="danger">Atualizar Email</ion-button>
       </form>
     </div>
 
@@ -97,7 +71,7 @@
           <ion-label position="floating">Confirme a Nova Senha</ion-label>
           <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
         </ion-item>
-        <ion-button expand="full" type="submit">Atualizar Senha</ion-button>
+        <ion-button expand="full" type="submit" color="danger">Atualizar Senha</ion-button>
       </form>
     </div>
 

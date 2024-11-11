@@ -1,101 +1,43 @@
-<ion-menu contentId="main-content" style="width: 50%">
-  <ion-content class="ion-padding menu-content">
-    <ion-avatar>
-      <img
-        alt="Silhouette of a person's head"
-        src="/assets/images/avatar.png"
-      />
-    </ion-avatar>
-    <h5 class="user-name">{{username}}</h5>
-
-    <ion-item routerLink="/index" class="menu-item">
-      <h4>Principal</h4>
-    </ion-item>
-    <ion-item routerLink="/perfil" class="menu-item">
-      <h4>Perfil</h4>
-    </ion-item>
-    <ion-item routerLink="/compartilhar" class="menu-item">
-      <h4>Compartilhar</h4>
-    </ion-item>
-    <ion-item routerLink="/mapa" class="menu-item">
-      <h4>Mapa</h4>
-    </ion-item>
-    <ion-item (click)="logout()" class="menu-item logout-item">
-      <h4>Sair</h4>
-    </ion-item>
-    <ion-img
-      src="/assets/images/iconemenu.png"
-      alt="tomate"
-      class="menu-icon"
-    ></ion-img>
-  </ion-content>
-</ion-menu>
-
 <div class="ion-page" id="main-content">
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button class="menu-button"></ion-menu-button>
       </ion-buttons>
-      <ion-title></ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-content class="ion-padding">
-    <ion-title class="welcome-title">Bem-Vindo</ion-title>
-    <ion-title class="sub-title">{{username}}</ion-title>
+    <ion-title class="welcome-title" style="font-size: 33px;">Bem-Vindo</ion-title>
 
-    <ion-title class="section-title">Conheça</ion-title>
-    <ion-title class="location-title">Sua localização</ion-title>
-
+    <ion-title class="section-title">Conheça Sua Localização</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
-        <!-- Slide 1: Arcos da Lapa -->
-        <div class="swiper-slide">
+        <div class="swiper-slide" *ngFor="let location of recommendedLocations">
           <div class="slide-box">
             <div class="slide-content">
-              <img src="/assets/images/paisagem.png" alt="Imagem" />
-              <label>Arcos da Lapa</label>
+              <img [src]="location.image" [alt]="location.name" />
+              <label>{{ location.name }}</label>
               <div>
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img
-                  src="/assets/images/avaliação.png"
-                  alt="avaliação"
-                  class="half-opacity"
-                />
-                <img
-                  src="/assets/images/avaliação.png"
-                  alt="avaliação"
-                  class="half-opacity"
-                />
+                <img *ngFor="let star of location.stars" src="/assets/images/avaliação.png" [class.half-opacity]="star.half" alt="avaliação" />
               </div>
             </div>
           </div>
         </div>
-        
       </div>
       <div class="swiper-pagination"></div>
     </div>
 
-    <ion-title class="section-title" style="margin-top: 5px">
-      Recomendados
-    </ion-title>
+    <ion-title class="section-title">Recomendados</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
-        <!-- 1º slide -->
-        <div class="swiper-slide">
+        <div class="swiper-slide" *ngFor="let recommendation of recommendedPlaces">
           <div class="slide-box">
             <div class="slide-content">
-              <img src="/assets/images/praia.png" alt="Imagem" />
-              <label>Praia</label>
+              <img [src]="recommendation.image" [alt]="recommendation.name" />
+              <label>{{ recommendation.name }}</label>
               <div>
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
-                <img src="/assets/images/avaliação.png" alt="avaliação" />
+                <img *ngFor="let star of recommendation.stars" src="/assets/images/avaliação.png" [class.half-opacity]="star.half" alt="avaliação" />
               </div>
             </div>
           </div>

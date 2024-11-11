@@ -2,50 +2,60 @@ import { Component } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { NavController, ModalController, ToastController } from '@ionic/angular';
 
+enum PasswordResetState {
+  RequestEmail = 'RequestEmail',
+  ConfirmToken = 'ConfirmToken',
+  ResetPassword = 'ResetPassword',
+}
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  PasswordResetState = PasswordResetState;
+  passwordResetState: PasswordResetState = PasswordResetState.RequestEmail;
+
   nome: string = '';
   senha: string = '';
-  email: string = ''; // Armazena o email para "esqueceu a senha"
-  newPassword: string = ''; // Armazena a nova senha
-  confirmPassword: string = ''; // Confirmação da nova senha
-  emailConfirmed: boolean = false; // Estado que mostra se o email foi confirmado
-  isForgotPasswordModalOpen: boolean = false; // Controla o modal de redefinição de senha
+  email: string = '';
+  newPassword: string = '';
+  confirmPassword: string = '';
+  token: string = '';
+  isForgotPasswordModalOpen: boolean = false;
 
   constructor(
-    private apiService: ApiService, 
-    private navCtrl: NavController, 
+    private apiService: ApiService,
+    private navCtrl: NavController,
     private modalCtrl: ModalController,
-    private toastCtrl: ToastController // Adicionando o ToastController para feedback do usuário
+    private toastCtrl: ToastController
   ) {}
 
-  // Função para exibir uma mensagem Toast
   async presentToast(message: string, duration: number = 2000) {
     const toast = await this.toastCtrl.create({
       message: message,
       duration: duration,
-      position: 'bottom'
+      position: 'bottom',
     });
     toast.present();
   }
 
-  // Função de login
   login() {
-    const credentials = {
-      nome: this.nome,
-      senha: this.senha
-    };
-
+    if (!this.nome || !this.senha) {
+      this.presentToast('Por favor, preencha todos os campos.');
+      return;
+    }
     this.apiService.login(this.nome, this.senha).subscribe(
       (response: any) => {
-        this.presentToast('Login bem-sucedido!');
-        localStorage.setItem('username', response.nome);
-        localStorage.setItem('userId', response.id);
-        this.navCtrl.navigateForward('/index');
+        if (response && response.id) {
+          localStorage.setItem('username', response.nome);
+          localStorage.setItem('userId', response.id);
+          this.presentToast('Login bem-sucedido!');
+          this.navCtrl.navigateForward('/index');
+        } else {
+          this.presentToast('Erro no login: dados de usuário não encontrados.');
+        }
       },
       (error) => {
         console.error('Erro ao realizar login', error);
@@ -54,74 +64,80 @@ export class HomePage {
     );
   }
 
-  // Abre o modal de "Esqueceu Senha?"
   openForgotPasswordModal() {
     this.isForgotPasswordModalOpen = true;
+    this.passwordResetState = PasswordResetState.RequestEmail;
   }
 
-  // Fecha o modal de "Esqueceu Senha?"
   closeForgotPasswordModal() {
     this.isForgotPasswordModalOpen = false;
-    this.emailConfirmed = false; // Reseta o estado quando o modal fecha
-    this.email = ''; // Limpa o campo de email
-    this.newPassword = ''; // Limpa o campo da nova senha
-    this.confirmPassword = ''; // Limpa o campo da confirmação da nova senha
+    this.resetForm();
   }
 
-  // Função para confirmar o email
+  resetForm() {
+    this.email = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.token = '';
+  }
+
   submitForgotPassword() {
-    console.log('Verificando email:', this.email);
-    
-    this.apiService.verificarEmail(this.email).subscribe(
+    if (!this.email || !this.validateEmail(this.email)) {
+      this.presentToast('Por favor, insira um e-mail válido.');
+      return;
+    }
+    this.apiService.requestPasswordReset(this.email).subscribe(
       (response: any) => {
-        console.log('Resposta da verificação:', response);
-        if (response.message === "E-mail verificado com sucesso!") {
-          this.emailConfirmed = true; // Se o email foi confirmado, habilita os campos de nova senha
-          this.presentToast('Email confirmado! Agora você pode redefinir sua senha.');
-        } else {
-          this.presentToast('Email não encontrado');
-        }
+        this.passwordResetState = PasswordResetState.ConfirmToken;
+        this.presentToast('Token de confirmação enviado para o seu e-mail.');
       },
       (error) => {
-        console.error('Erro ao verificar email', error);
-        this.presentToast('Erro ao verificar email.');
+        console.error('Erro ao enviar token de confirmação', error);
+        this.presentToast('Erro ao enviar o token de confirmação.');
       }
     );
   }
 
-  // Função para redefinir a senha
+  confirmToken() {
+    if (!this.token) {
+      this.presentToast('Por favor, insira o token recebido.');
+      return;
+    }
+    this.apiService.confirmPasswordReset(this.token, this.newPassword).subscribe(
+      () => {
+        this.passwordResetState = PasswordResetState.ResetPassword;
+        this.presentToast('Token confirmado! Agora você pode redefinir sua senha.');
+      },
+      (error) => {
+        console.error('Erro ao confirmar token', error);
+        this.presentToast('Token inválido ou expirado.');
+      }
+    );
+  }
+
   resetPassword() {
-    if (this.newPassword !== this.confirmPassword) {
+    if (!this.newPassword || this.newPassword !== this.confirmPassword) {
       this.presentToast('As senhas não coincidem!');
       return;
     }
-
-    // Validação adicional da força da senha (exemplo simples)
     if (this.newPassword.length < 6) {
       this.presentToast('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
-
-    // Chamada para redefinir a senha
     this.apiService.redefinirSenha(this.email, this.newPassword, this.confirmPassword).subscribe(
       (response: any) => {
-        // Ajuste para verificar a resposta da API
-        if (response.message === "Senha redefinida com sucesso!") {
-          this.presentToast('Senha redefinida com sucesso!');
-          this.closeForgotPasswordModal(); // Fecha o modal após redefinir a senha
-        } else {
-          this.presentToast('Erro ao redefinir senha: ' + response.message);
-        }
+        this.presentToast('Senha redefinida com sucesso!');
+        this.closeForgotPasswordModal();
       },
       (error) => {
         console.error('Erro ao redefinir senha', error);
-        // Adiciona uma mensagem de erro mais detalhada
-        if (error.error && error.error.message) {
-          this.presentToast('Erro ao redefinir senha: ' + error.error.message);
-        } else {
-          this.presentToast('Erro ao redefinir senha.');
-        }
+        this.presentToast('Erro ao redefinir senha.');
       }
     );
   }
-} 
+
+  validateEmail(email: string): boolean {
+    const re = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    return re.test(email);
+  }
+}
