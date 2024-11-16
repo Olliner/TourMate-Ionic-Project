@@ -13,7 +13,7 @@ export class MapaPage implements OnInit {
   searchQuery: string = ''; // Para a barra de pesquisa
   isCardVisible: boolean = false; // Para controlar a visibilidade do card
   locationName: string = ''; // Para armazenar o nome do local
-  stars: number[] = [1, 2, 3, 4, 5]; // Array de estrelas
+  stars: { filled: boolean }[] = Array(5).fill({ filled: false }); // Ícones de avaliação
   rating: number = 0; // Avaliação do local
   imageSrc: string | null = null; // Para armazenar a imagem importada
   savedData: any[] = []; // Array para armazenar os dados salvos
@@ -57,6 +57,11 @@ export class MapaPage implements OnInit {
   // Define a avaliação do local
   setRating(rating: number) {
     this.rating = rating;
+
+    // Atualiza a lista de estrelas preenchidas com base na avaliação
+    this.stars = this.stars.map((_, index) => ({
+      filled: index < this.rating,
+    }));
   }
 
   // Lida com o upload de arquivo
@@ -94,5 +99,8 @@ export class MapaPage implements OnInit {
     this.locationName = '';
     this.rating = 0;
     this.imageSrc = null;
+
+    // Reseta as estrelas visuais
+    this.stars = this.stars.map(() => ({ filled: false }));
   }
 }
