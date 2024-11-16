@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Loader } from '@googlemaps/js-api-loader';
 
 @Component({
@@ -10,14 +11,14 @@ export class MapaPage implements OnInit {
   @ViewChild('mapElement', { static: true }) mapElement!: ElementRef;
   map: google.maps.Map | undefined;
 
-  searchQuery: string = ''; // Para a barra de pesquisa
-  isCardVisible: boolean = false; // Para controlar a visibilidade do card
-  locationName: string = ''; // Para armazenar o nome do local
-  stars: { filled: boolean }[] = Array(5).fill({ filled: false }); // Ícones de avaliação
-  rating: number = 0; // Avaliação do local
-  imageSrc: string | null = null; // Para armazenar a imagem importada
-  savedData: any[] = []; // Array para armazenar os dados salvos
-  feedbackMessage: string = ''; // Mensagem de feedback para o usuário
+  searchQuery: string = '';
+  isCardVisible: boolean = false;
+  locationName: string = '';
+  stars: number[] = [1, 2, 3, 4, 5];
+  rating: number = 0;
+  imageSrc: string | null = null;
+  savedData: any[] = [];
+  feedbackMessage: string = '';
 
   constructor() {}
 
@@ -27,14 +28,14 @@ export class MapaPage implements OnInit {
 
   initMap() {
     const loader = new Loader({
-      apiKey: 'AIzaSyBvuqpS3outT1rMHLKy378FcuugHz12DkI', // Sua chave de API
+      apiKey: 'AIzaSyBvuqpS3outT1rMHLKy378FcuugHz12DkI',
       version: 'weekly',
-      libraries: ['places'], // Inclui a biblioteca 'places' necessária para a pesquisa
+      libraries: ['places'],
     });
 
     loader.load().then(() => {
       const mapOptions: google.maps.MapOptions = {
-        center: { lat: -23.55052, lng: -46.633308 }, // Coordenadas iniciais
+        center: { lat: -23.55052, lng: -46.633308 },
         zoom: 12,
       };
 
@@ -42,41 +43,51 @@ export class MapaPage implements OnInit {
     });
   }
 
-  // Mostra/oculta o card
   toggleCard() {
     this.isCardVisible = !this.isCardVisible;
-    this.feedbackMessage = ''; // Limpa mensagens ao abrir o card
+    this.feedbackMessage = '';
   }
 
-  // Fecha o card
   closeCard() {
     this.isCardVisible = false;
-    this.feedbackMessage = ''; // Limpa mensagens ao fechar o card
+    this.feedbackMessage = '';
   }
 
-  // Define a avaliação do local
   setRating(rating: number) {
     this.rating = rating;
-
-    // Atualiza a lista de estrelas preenchidas com base na avaliação
-    this.stars = this.stars.map((_, index) => ({
-      filled: index < this.rating,
-    }));
   }
 
-  // Lida com o upload de arquivo
+  // Captura foto usando a câmera
+  async capturePhoto() {
+    try {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        quality: 90,
+      });
+
+      // Verifica se o dataUrl é definido
+      if (photo.dataUrl) {
+        this.imageSrc = photo.dataUrl;
+      } else {
+        console.error('Foto capturada não contém dataUrl.');
+      }
+    } catch (error) {
+      console.error('Erro ao capturar foto:', error);
+    }
+  }
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.imageSrc = reader.result as string; // Armazena a imagem em base64 para exibição
+        this.imageSrc = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // Salva as informações fornecidas
   saveData() {
     if (!this.locationName || this.rating === 0) {
       this.feedbackMessage = 'Por favor, preencha todas as informações antes de salvar.';
@@ -89,18 +100,13 @@ export class MapaPage implements OnInit {
       image: this.imageSrc,
     };
 
-    this.savedData.push(data); // Salva os dados no array
+    this.savedData.push(data);
     console.log('Dados salvos:', this.savedData);
 
-    // Atualiza a mensagem de sucesso
     this.feedbackMessage = 'Informações salvas com sucesso!';
 
-    // Limpa os campos (mantém o card aberto para que o usuário veja a mensagem)
     this.locationName = '';
     this.rating = 0;
     this.imageSrc = null;
-
-    // Reseta as estrelas visuais
-    this.stars = this.stars.map(() => ({ filled: false }));
   }
 }
