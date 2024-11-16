@@ -1,12 +1,89 @@
-<div class="ion-page" id="main-content">
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-menu-button class="menu-button"></ion-menu-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button class="menu-button"></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-content class="ion-padding">
-    <div #mapElement id="map" style="height: 100%; width: 100%;"></div>
-  </ion-content>
+<ion-content class="ion-padding">
+  <!-- Barra de Pesquisa e Botão -->
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <ion-searchbar
+      id="searchBox"
+      [(ngModel)]="searchQuery"
+      debounce="500"
+      placeholder="Digite o nome do local">
+    </ion-searchbar>
+    <ion-button (click)="toggleCard()" color="primary">
+      +
+    </ion-button>
+  </div>
+
+  <!-- Mapa -->
+  <div #mapElement id="map" style="height: 80%; width: 100%;"></div>
+
+  <!-- Card de Compartilhamento -->
+  <ion-card *ngIf="isCardVisible" class="card-overlay">
+    <ion-card-header>
+      <ion-card-title style="text-align: center;">Compartilhar Local</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <!-- Foto do Local -->
+      <div style="text-align: center; margin-bottom: 10px;">
+        Foto do Local:
+        <div style="margin-top: 10px;">
+          <!-- Botão estilizado para upload -->
+          <label for="fileInput" style="cursor: pointer; color: white; background-color: #3880ff; padding: 10px 20px; border-radius: 5px; display: inline-block;">
+            Escolher Arquivo
+          </label>
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/png"
+            (change)="onFileSelected($event)"
+            style="display: none;"/>
+        </div>
+        <!-- Exibição da imagem selecionada -->
+        <div *ngIf="imageSrc" style="margin-top: 10px;">
+          <img [src]="imageSrc" alt="Imagem do Local" style="width: 100%; max-height: 200px; object-fit: contain;" />
+        </div>
+      </div>
+
+      <!-- Nome -->
+      <ion-item>
+        <ion-label position="floating">Nome</ion-label>
+        <ion-input [(ngModel)]="locationName"></ion-input>
+      </ion-item>
+
+      <!-- Avaliação -->
+      <div style="text-align: center; margin-top: 20px;">
+        Avaliação:
+        <div class="stars">
+          <ion-icon
+            *ngFor="let star of stars; let i = index"
+            [name]="i < rating ? 'star' : 'star-outline'"
+            (click)="setRating(i + 1)"
+            style="font-size: 30px; cursor: pointer;">
+          </ion-icon>
+        </div>
+      </div>
+
+      <!-- Mensagem de Feedback -->
+      <div *ngIf="feedbackMessage" style="margin-top: 20px; text-align: center; color: green;">
+        {{ feedbackMessage }}
+      </div>
+
+      <!-- Botões -->
+      <div style="display: flex; justify-content: center; gap: 35px; margin-top: 20px;">
+        <ion-button (click)="saveData()" color="success">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="closeCard()" color="danger">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
