@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button class="menu-button"></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Barra de Pesquisa e Botão -->
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <ion-searchbar
+      id="searchBox"
+      [(ngModel)]="searchQuery"
+      debounce="500"
+      placeholder="Digite o nome do local">
+    </ion-searchbar>
+    <ion-button (click)="toggleCard()" color="primary">
+      +
+    </ion-button>
+  </div>
+
+  <!-- Mapa -->
+  <div #mapElement id="map" style="height: 80%; width: 100%;"></div>
+
+  <!-- Card de Compartilhamento -->
+  <ion-card *ngIf="isCardVisible" class="card-overlay">
+    <ion-card-header>
+      <ion-card-title style="text-align: center;">Compartilhar Local</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div style="text-align: center; margin-bottom: 10px;">
+        Foto do Local:
+        <div style="margin-top: 10px;">
+
+          <!-- Botão para upload via arquivo -->
+          <label for="fileInput" class="upload-btn">
+            Escolher Arquivo
+          </label>
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/png"
+            (change)="onFileSelected($event)"
+            style="display: none;"
+          />
+
+          <!-- Botão para capturar foto -->
+          <ion-button color="primary" (click)="capturePhoto()" class="capture-btn" style="margin-top: 10px;">
+            Tirar Foto
+          </ion-button>
+        </div>
+
+        <!-- Exibição da imagem -->
+        <div *ngIf="imageSrc" style="margin-top: 10px;">
+          <img [src]="imageSrc" alt="Imagem do Local" style="width: 100%; max-height: 200px; object-fit: contain;" />
+        </div>
+      </div>
+
+      <!-- Nome -->
+      <ion-item>
+        <ion-label position="floating">Nome</ion-label>
+        <ion-input [(ngModel)]="locationName"></ion-input>
+      </ion-item>
+
+      <!-- Avaliação -->
+      <div style="text-align: center; margin-top: 20px;">
+        Avaliação:
+        <div class="stars">
+          <img
+            *ngFor="let star of stars; let i = index"
+            src="/assets/images/avaliação.png"
+            [class.half-opacity]="i >= rating"
+            alt="Avaliação"
+            (click)="setRating(i + 1)"
+            style="width: 30px; height: 30px; cursor: pointer; margin: 0 5px;" />
+        </div>
+      </div>
+
+      <!-- Mensagem de Feedback -->
+      <div *ngIf="feedbackMessage" style="margin-top: 20px; text-align: center; color: green;">
+        {{ feedbackMessage }}
+      </div>
+
+      <!-- Botões -->
+      <div style="display: flex; justify-content: center; gap: 35px; margin-top: 20px;">
+        <ion-button (click)="saveData()" color="success">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="closeCard()" color="danger">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
