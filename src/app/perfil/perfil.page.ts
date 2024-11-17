@@ -111,7 +111,7 @@ export class PerfilPage implements OnInit {
       if (file) {
         const loading = await this.presentLoading('Atualizando avatar...');
         this.apiService.uploadAvatar(this.userId, file).subscribe(
-          (response: any) => {  // Altere o tipo para `any` ou o tipo correto da resposta
+          (response: any) => { // Altere o tipo para `any` ou o tipo correto da resposta
             loading.dismiss();
   
             if (response && response.avatar_url) {
@@ -119,8 +119,10 @@ export class PerfilPage implements OnInit {
               this.avatarUrl = `${response.avatar_url}?t=${new Date().getTime()}`;
               console.log('URL do avatar após atualização:', this.avatarUrl);
               this.presentToast('Avatar atualizado com sucesso!');
-              // Atualiza o avatar através do método getUserAvatar
-              this.loadUserProfile();  // Recarrega o perfil e o avatar
+              // Recarrega a página para refletir a mudança
+              setTimeout(() => {
+                location.reload(); // Recarrega a página após um curto delay
+              }, 500);
             } else {
               console.error('URL do avatar retornada está vazia ou indefinida');
               this.presentToast('Erro ao atualizar avatar.');
@@ -136,6 +138,7 @@ export class PerfilPage implements OnInit {
     };
     input.click();
   }
+  
   
 
 

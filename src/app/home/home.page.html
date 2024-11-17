@@ -45,41 +45,39 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-
+  
       <ion-content>
-        <!-- Formulário para enviar e-mail -->
+        <!-- Etapa 1: Solicitar e-mail -->
         <form *ngIf="passwordResetState === PasswordResetState.RequestEmail" (ngSubmit)="submitForgotPassword()">
           <ion-item>
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
           </ion-item>
-          <ion-button type="submit" expand="block">Confirmar Email</ion-button>
+          <ion-button type="submit" expand="block">Confirmar E-mail</ion-button>
         </form>
-
-        <!-- Formulário para inserir o token e a nova senha -->
-        <form *ngIf="passwordResetState === PasswordResetState.ConfirmToken" (ngSubmit)="confirmToken()" #tokenForm="ngForm">
+  
+        <!-- Etapa 2: Confirmar token -->
+        <form *ngIf="passwordResetState === PasswordResetState.ConfirmToken" (ngSubmit)="confirmToken()">
           <ion-item>
             <ion-label position="floating">Token</ion-label>
             <ion-input type="text" [(ngModel)]="token" name="token" required></ion-input>
           </ion-item>
-          <ion-button type="submit" expand="block" [disabled]="tokenForm.invalid">Confirmar Token</ion-button>
+          <ion-button type="submit" expand="block">Confirmar Token</ion-button>
         </form>
-
-        <!-- Campos de nova senha após confirmar o token -->
+  
+        <!-- Etapa 3: Redefinir senha -->
         <form *ngIf="passwordResetState === PasswordResetState.ResetPassword" (ngSubmit)="resetPassword()">
           <ion-item>
             <ion-label position="floating">Nova Senha</ion-label>
             <ion-input type="password" [(ngModel)]="newPassword" name="newPassword" required minlength="6"></ion-input>
           </ion-item>
-
           <ion-item>
             <ion-label position="floating">Confirmar Senha</ion-label>
             <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required></ion-input>
           </ion-item>
-
           <ion-button type="submit" expand="block">Redefinir Senha</ion-button>
         </form>
       </ion-content>
     </ng-template>
-  </ion-modal>
+  </ion-modal>  
 </ion-content>

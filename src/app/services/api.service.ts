@@ -21,7 +21,7 @@ interface Evaluation {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://crudtourmate-2717319c3c8e.herokuapp.com';
+  private apiUrl = 'https://crudtourmate-2717319c3c8e.herokuapp.com'; // URL da API
 
   constructor(private http: HttpClient) {}
 
@@ -66,14 +66,21 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/users/verify-email`, { email });
   }
 
-  // Método para solicitar o envio de e-mail para redefinição de senha
+  // Funções de redefinição de senha
   requestPasswordReset(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password/request`, { email });
   }
 
-  // Método para confirmar o token e redefinir a senha
-  confirmPasswordReset(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reset-password/confirm`, { token, newPassword });
+  validateToken(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password/validate-token`, { token });
+  }
+
+  resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password/confirm`, {
+      token,
+      newPassword,
+      confirmPassword
+    });
   }
 
   // Função para redefinir a senha com confirmação de e-mail

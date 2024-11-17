@@ -87,7 +87,7 @@ export class HomePage {
       return;
     }
     this.apiService.requestPasswordReset(this.email).subscribe(
-      (response: any) => {
+      () => {
         this.passwordResetState = PasswordResetState.ConfirmToken;
         this.presentToast('Token de confirmação enviado para o seu e-mail.');
       },
@@ -103,7 +103,7 @@ export class HomePage {
       this.presentToast('Por favor, insira o token recebido.');
       return;
     }
-    this.apiService.confirmPasswordReset(this.token, this.newPassword).subscribe(
+    this.apiService.validateToken(this.token).subscribe(
       () => {
         this.passwordResetState = PasswordResetState.ResetPassword;
         this.presentToast('Token confirmado! Agora você pode redefinir sua senha.');
@@ -124,8 +124,8 @@ export class HomePage {
       this.presentToast('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
-    this.apiService.redefinirSenha(this.email, this.newPassword, this.confirmPassword).subscribe(
-      (response: any) => {
+    this.apiService.resetPassword(this.token, this.newPassword, this.confirmPassword).subscribe(
+      () => {
         this.presentToast('Senha redefinida com sucesso!');
         this.closeForgotPasswordModal();
       },
