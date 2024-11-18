@@ -18,7 +18,7 @@
         <ion-icon name="person-circle-outline" slot="start"></ion-icon>
         <ion-label>Perfil</ion-label>
       </ion-item>
-      <ion-item routerLink="/compartilhar" class="menu-item">
+      <ion-item routerLink="/mapa" [queryParams]="{ showCard: true }" class="menu-item">
         <ion-icon name="share-social-outline" slot="start"></ion-icon>
         <ion-label>Compartilhar</ion-label>
       </ion-item>
