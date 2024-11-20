@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Loader } from '@googlemaps/js-api-loader';
 
@@ -20,10 +21,17 @@ export class MapaPage implements OnInit {
   savedData: any[] = [];
   feedbackMessage: string = '';
 
-  constructor() {}
+  constructor(private route: ActivatedRoute) {} // Adicionado ActivatedRoute para ler os parâmetros da rota
 
   ngOnInit() {
     this.initMap();
+
+    // Verifica se o parâmetro "showCard" foi passado
+    this.route.queryParams.subscribe((params) => {
+      if (params['showCard'] === 'true') {
+        this.isCardVisible = true; // Mostra o card automaticamente
+      }
+    });
   }
 
   initMap() {
