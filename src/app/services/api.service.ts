@@ -51,14 +51,17 @@ export class ApiService {
     return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
   }
 
-  // Função para atualizar os dados do usuário
-  updateUserProfile(userId: string, userData: Partial<{ email: string; senha: string }>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${userId}`, userData);
+  // Função para atualizar a senha do usuário
+  updateUserPassword(userId: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${userId}/update-password`, {
+      senha: newPassword,
+      confirmar_senha: confirmPassword
+    });
   }
 
-  // Função para atualizar o email e senha do usuário
-  updateUserEmailPassword(id: string, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${id}/update`, data);
+  // Função para atualizar o email do usuário
+  updateUserEmail(userId: string, newEmail: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${userId}/update-email`, { email: newEmail });
   }
   
   // Função para verificar o email do usuário
