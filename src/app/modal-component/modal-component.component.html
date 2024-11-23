@@ -1,54 +1,52 @@
-<ion-header style="box-shadow: none;">
+<ion-header>
   <ion-toolbar>
-    <ion-title>Avaliação</ion-title>
+    <ion-title>{{ location?.name }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()">Fechar</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<div style="height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; background-color: #d9d9d9; border: solid 2px;">
-  <img src="/assets/images/paisagem.png" alt="Imagem" style="width: 200px;" />
-  <label>Arcos da Lapa</label>
-</div>
-
-<h5>Comentários</h5>
-
-<div *ngIf="comentarios.length > 0; else noComments">
-  <div *ngFor="let comentario of comentarios" style="padding: 10px;">
-    <div style="display: flex; align-items: center;">
-      <img alt="Avatar do usuário" src="/assets/images/avatar.png" style="width: 40px; height: 40px;" />
-      <h5 style="margin-left: 10px;">{{ comentario.nome || 'Usuário Desconhecido' }}</h5>
-    </div>
-    <p style="margin-left: 10px;" *ngIf="comentario.comentario">{{ comentario.comentario }}</p>
-    <p style="margin-left: 10px; font-style: italic;" *ngIf="!comentario.comentario">Sem comentário.</p>
-  </div>
-</div>
-
-<ng-template #noComments>
-  <p>Não há comentários...</p>
-</ng-template>
-
-
 <ion-content>
-  <ion-item>
-    <ion-label position="floating">Comentário</ion-label>
-    <ion-textarea [(ngModel)]="comment" placeholder="Escreva seu comentário aqui..."></ion-textarea>
-  </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Avaliação</ion-label>
+  <!-- Imagem do local -->
+  <div class="location-image-container">
+    <img [src]="location?.image" [alt]="location?.name" class="location-image" />
+  </div>
+
+  <div>
+    <h2>Comentários</h2>
+    <ion-list>
+      <ion-item *ngFor="let comentario of comentarios">
+        <ion-label>
+          <h3>{{ comentario.comment }}</h3>
+          <p>Avaliação: {{ comentario.rating }}/5</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div>
+    <h2>Deixe sua avaliação</h2>
+    <ion-textarea
+      [(ngModel)]="comment"
+      placeholder="Escreva seu comentário aqui..."
+    ></ion-textarea>
+
+    <!-- Seção de avaliação com tomates -->
     <div class="rating-container">
-      <img *ngFor="let num of [1, 2, 3, 4, 5]" 
-           src="/assets/images/avaliação2.png" 
-           alt="Rating" 
+      <div class="tomato" *ngFor="let num of [1, 2, 3, 4, 5]" 
            (click)="selectRating(num)"
-           [style.opacity]="(rating ?? 0) >= num ? 1 : 0.5"
-           class="rating-img">
+           [class.selected]="(rating ?? 0) >= num">
+        🍅
+      </div>
     </div>
-  </ion-item>
 
-  <ion-button expand="full" (click)="submitEvaluation()" [disabled]="!comment || rating === null">
-    Enviar
-  </ion-button>
+    <ion-button
+      expand="full"
+      (click)="submitEvaluation()"
+      [disabled]="!comment || rating === null">
+      Enviar Avaliação
+    </ion-button>
+  </div>
 </ion-content>

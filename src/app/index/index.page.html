@@ -13,13 +13,22 @@
     <ion-title class="section-title">Conheça Sua Localização</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
-        <div class="swiper-slide" *ngFor="let location of recommendedLocations">
+        <div
+          class="swiper-slide"
+          *ngFor="let location of recommendedLocations"
+          (click)="openModal(location)">
           <div class="slide-box">
             <div class="slide-content">
-              <img [src]="location.image" [alt]="location.name" />
+              <img [src]="location.image" [alt]="location.name" class="location-image" />
               <label>{{ location.name }}</label>
               <div>
-                <img *ngFor="let star of location.stars" src="/assets/images/avaliação.png" [class.half-opacity]="star.half" alt="avaliação" />
+                <img
+                  *ngFor="let star of location.stars"
+                  src="/assets/images/avaliação.png"
+                  [class.half-opacity]="star.half"
+                  alt="avaliação"
+                  class="rating-icon"
+                />
               </div>
             </div>
           </div>
@@ -31,13 +40,22 @@
     <ion-title class="section-title">Recomendados</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
-        <div class="swiper-slide" *ngFor="let recommendation of recommendedPlaces">
+        <div
+          class="swiper-slide"
+          *ngFor="let recommendation of recommendedPlaces"
+          (click)="openModal(recommendation)">
           <div class="slide-box">
             <div class="slide-content">
-              <img [src]="recommendation.image" [alt]="recommendation.name" />
+              <img [src]="recommendation.image" [alt]="recommendation.name" class="location-image"/>
               <label>{{ recommendation.name }}</label>
               <div>
-                <img *ngFor="let star of recommendation.stars" src="/assets/images/avaliação.png" [class.half-opacity]="star.half" alt="avaliação" />
+                <img
+                  *ngFor="let star of recommendation.stars"
+                  src="/assets/images/avaliação.png"
+                  [class.half-opacity]="star.half"
+                  alt="avaliação"
+                  class="rating-icon"
+                />
               </div>
             </div>
           </div>

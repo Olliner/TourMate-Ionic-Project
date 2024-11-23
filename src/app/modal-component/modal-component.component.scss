@@ -1,13 +1,22 @@
 .rating-container {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 5px;
-  }
-  
-  .rating-img {
-    width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+
+  .tomato {
+    font-size: 30px;
     cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.5;
+
+    &.selected {
+      opacity: 1;
+      transform: scale(1.2); /* Destaca os tomates selecionados */
+    }
   }
-  
+
+  .tomato:hover {
+    transform: scale(1.1); /* Efeito ao passar o mouse */
+  }
+}
