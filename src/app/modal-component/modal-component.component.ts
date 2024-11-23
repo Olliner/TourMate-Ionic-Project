@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { ApiService } from '../services/api.service'; // Importação do serviço de API
 
 @Component({
   selector: 'app-modal-component',
@@ -10,18 +8,18 @@ import { of } from 'rxjs';
   styleUrls: ['./modal-component.component.scss'],
 })
 export class ModalComponentComponent implements OnInit {
-  comment: string = ''; 
-  rating: number | null = null; 
-  apiUrl: string = 'https://crudtourmate-2717319c3c8e.herokuapp.com/comentarios'; // URL da API
-  comentarios: any[] = []; // Array para armazenar os comentários
+  comment: string = ''; // Comentário do usuário
+  rating: number | null = null; // Avaliação selecionada
+  location: string = ''; // Local selecionado, recebido ao abrir o modal
+  comentarios: any[] = []; // Array para armazenar os comentários do local
 
   constructor(
     private modalController: ModalController,
-    private http: HttpClient
+    private apiService: ApiService // Injeção do serviço de API
   ) {}
 
   ngOnInit() {
-    this.getComentarios(); // Chama a função para obter os comentários ao iniciar o modal
+    this.getComentarios(); // Busca os comentários ao iniciar o modal
   }
 
   async closeModal() {
@@ -29,48 +27,43 @@ export class ModalComponentComponent implements OnInit {
   }
 
   selectRating(num: number) {
-    this.rating = num;
+    this.rating = num; // Define a avaliação selecionada
   }
 
-  // Função para obter os comentários da API
+  // Função para buscar os comentários da API
   getComentarios() {
-    this.http.get(this.apiUrl).subscribe(
+    this.apiService.getEvaluations(this.location).subscribe(
       (response: any) => {
-        this.comentarios = response.comentarios; // Armazena os comentários recebidos
+        this.comentarios = response || []; // Armazena os comentários recebidos
       },
       (error) => {
-        console.error('Erro ao buscar comentários', error);
+        console.error('Erro ao buscar comentários:', error);
       }
     );
   }
 
+  // Envia avaliação e comentário para a API
   submitEvaluation() {
     const nome = localStorage.getItem('username'); // Obtém o nome do usuário logado do localStorage
 
     if (this.comment && this.rating !== null && nome) {
-      const comentarioData = {
-        nome: nome,
-        comentario: this.comment,
-        avaliacao: this.rating
+      const evaluationData = {
+        location: this.location,
+        comment: this.comment,
+        rating: this.rating,
       };
 
-      this.http.post(this.apiUrl, comentarioData)
-        .pipe(
-          catchError(error => {
-            console.error('Erro ao enviar comentário:', error);
-            return of(null);
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            console.log('Comentário enviado com sucesso:', response);
-            this.getComentarios(); // Atualiza os comentários após enviar um novo
-            this.comment = '';  // Limpa o campo de comentário
-            this.rating = null;  // Reseta a avaliação
-
-            // O modal não fechará automaticamente após o envio
-          }
-        });
+      this.apiService.submitEvaluation(evaluationData).subscribe(
+        (response) => {
+          console.log('Comentário enviado com sucesso:', response);
+          this.getComentarios(); // Atualiza os comentários após envio
+          this.comment = ''; // Reseta o campo de comentário
+          this.rating = null; // Reseta a avaliação
+        },
+        (error) => {
+          console.error('Erro ao enviar comentário:', error);
+        }
+      );
     } else {
       console.error('Preencha o comentário, a avaliação e esteja logado.');
     }

@@ -1,47 +1,52 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ModalController, NavController, LoadingController, ToastController } from '@ionic/angular';
 import Swiper from 'swiper';
 import type { SwiperOptions } from 'swiper/types';
 import { ModalComponentComponent } from '../modal-component/modal-component.component';
-import { ApiService } from '../services/api.service'; // Importando o ApiService para uso de upload de avatar e perfil
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-index',
   templateUrl: './index.page.html',
   styleUrls: ['./index.page.scss'],
 })
-export class IndexPage implements OnInit {
+export class IndexPage implements OnInit, AfterViewInit {
   swiper: Swiper | null = null;
   username: string = '';
   avatarUrl: string = '';
-  userId: string = ''; // ID do usuário para operações de perfil
+  userId: string = '';
+  comentarios: any[] = [];
+  clickListenersAdded: Set<Element> = new Set(); // Rastreamento de elementos que já possuem listeners
 
   recommendedLocations = [
     { name: 'Arcos da Lapa', image: '/assets/images/paisagem.png', stars: this.getStarRatings(3.5) },
-    // Adicione outros locais conforme necessário
+    { name: 'Cristo Redentor', image: '/assets/images/paisagem.png', stars: this.getStarRatings(4) },
   ];
   recommendedPlaces = [
-    { name: 'Praia', image: '/assets/images/praia.png', stars: this.getStarRatings(5) },
-    // Adicione outros lugares conforme necessário
+    { name: 'Grumari', image: '/assets/images/praia.png', stars: this.getStarRatings(5) },
+    { name: 'Barra da Tijuca', image: '/assets/images/praia.png', stars: this.getStarRatings(3) },
+    { name: 'Parque lage', image: '/assets/images/paisagem.png', stars: this.getStarRatings(3.5) }
   ];
 
   constructor(
     private modalController: ModalController,
     private navCtrl: NavController,
-    private apiService: ApiService, // Injeta ApiService para operações de API
+    private apiService: ApiService,
     private loadingController: LoadingController,
     private toastController: ToastController
   ) {}
 
   ngOnInit() {
     this.loadUserProfile();
+  }
+
+  ngAfterViewInit() {
     this.initializeSwiper();
   }
 
   private async loadUserProfile() {
-    this.userId = localStorage.getItem('userId') || ''; // Recupera o ID do usuário do localStorage
+    this.userId = localStorage.getItem('userId') || '';
     if (this.userId) {
-      // Carrega o perfil do usuário
       this.apiService.getUserProfile(this.userId).subscribe(user => {
         this.username = user.nome;
         this.loadUserAvatar();
@@ -77,21 +82,32 @@ export class IndexPage implements OnInit {
   }
 
   private addSlideClickListeners() {
-    const slides = document.querySelectorAll('.swiper-slide');
-    slides.forEach(slide => {
-      slide.addEventListener('click', () => {
-        const location = (slide.querySelector('label') as HTMLElement)?.innerText || 'Local não definido';
-        this.openModal(location);
+    setTimeout(() => {
+      const slides = document.querySelectorAll('.swiper-slide');
+      slides.forEach(slide => {
+        if (!this.clickListenersAdded.has(slide)) {
+          slide.addEventListener('click', this.handleSlideClick.bind(this));
+          this.clickListenersAdded.add(slide); // Marca o slide como tendo um listener adicionado
+        }
       });
-    });
+    }, 500);
+  }
+
+  private handleSlideClick(event: Event) {
+    const slide = event.currentTarget as HTMLElement;
+    const location = slide.querySelector('label')?.innerText || 'Local não definido';
+    this.openModal(location);
   }
 
   async openModal(location: string) {
     const modal = await this.modalController.create({
       component: ModalComponentComponent,
-      componentProps: { location },
+      componentProps: {
+        location: location,
+        comentarios: this.comentarios,
+      },
     });
-    await modal.present();
+    return await modal.present();
   }
 
   async selectAvatar() {
@@ -103,13 +119,12 @@ export class IndexPage implements OnInit {
       if (file) {
         const loading = await this.presentLoading('Atualizando avatar...');
         this.apiService.uploadAvatar(this.userId, file).subscribe(
-          (response: any) => { // Corrigindo o tipo para `any` ou o tipo correto da resposta
+          (response: any) => {
             loading.dismiss();
-
             if (response && response.avatar_url) {
               this.avatarUrl = `${response.avatar_url}?t=${new Date().getTime()}`;
               this.presentToast('Avatar atualizado com sucesso!');
-              this.loadUserAvatar(); // Atualiza o avatar ao recarregar o perfil
+              this.loadUserAvatar();
             } else {
               console.error('URL do avatar retornada está vazia ou indefinida');
               this.presentToast('Erro ao atualizar avatar.');

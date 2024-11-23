@@ -24,32 +24,55 @@ export class MapaPage implements OnInit {
   constructor(private route: ActivatedRoute) {} // Adicionado ActivatedRoute para ler os parâmetros da rota
 
   ngOnInit() {
-    this.initMap();
-
-    // Verifica se o parâmetro "showCard" foi passado
     this.route.queryParams.subscribe((params) => {
+      const lat = parseFloat(params['lat']);
+      const lng = parseFloat(params['lng']);
+      const locationName = params['name'];
+  
+      // Inicializa o mapa com o local específico se os parâmetros existirem
+      if (lat && lng) {
+        this.initMap(lat, lng, locationName);
+      } else {
+        // Inicializa o mapa com a posição padrão
+        this.initMap();
+      }
+  
+      // Verifica se o parâmetro "showCard" foi passado
       if (params['showCard'] === 'true') {
         this.isCardVisible = true; // Mostra o card automaticamente
       }
     });
   }
+  
 
-  initMap() {
+  initMap(lat?: number, lng?: number, locationName?: string) {
     const loader = new Loader({
       apiKey: 'AIzaSyBvuqpS3outT1rMHLKy378FcuugHz12DkI',
       version: 'weekly',
       libraries: ['places'],
     });
-
+  
     loader.load().then(() => {
+      const center = lat && lng ? { lat, lng } : { lat: -23.55052, lng: -46.633308 }; // Posição padrão para São Paulo
+  
       const mapOptions: google.maps.MapOptions = {
-        center: { lat: -23.55052, lng: -46.633308 },
-        zoom: 12,
+        center: center,
+        zoom: lat && lng ? 15 : 12, // Aproxima mais se for localização específica
       };
-
+  
       this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+  
+      // Adiciona marcador se coordenadas forem fornecidas
+      if (lat && lng && locationName) {
+        new google.maps.Marker({
+          position: { lat, lng },
+          map: this.map,
+          title: locationName,
+        });
+      }
     });
   }
+  
 
   toggleCard() {
     this.isCardVisible = !this.isCardVisible;

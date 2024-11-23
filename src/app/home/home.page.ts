@@ -24,6 +24,8 @@ export class HomePage {
   confirmPassword: string = '';
   token: string = '';
   isForgotPasswordModalOpen: boolean = false;
+  avatarUrl: string = '/assets/images/avatar.png';
+
 
   constructor(
     private apiService: ApiService,
@@ -51,8 +53,22 @@ export class HomePage {
         if (response && response.id) {
           localStorage.setItem('username', response.nome);
           localStorage.setItem('userId', response.id);
+  
+          // Atualizar avatar e nome no AppComponent
+          this.apiService.getUserProfile(response.id).subscribe((user) => {
+            this.apiService.getUserAvatar(response.id).subscribe((avatarUrl) => {
+              this.avatarUrl = avatarUrl
+                ? `${avatarUrl}?t=${new Date().getTime()}`
+                : '/assets/images/avatar.png';
+            });
+          });
+  
           this.presentToast('Login bem-sucedido!');
-          this.navCtrl.navigateForward('/index');
+          
+          // Navegar e recarregar a página
+          this.navCtrl.navigateForward('/index').then(() => {
+            location.reload(); // Recarrega a página após navegação
+          });
         } else {
           this.presentToast('Erro no login: dados de usuário não encontrados.');
         }
@@ -63,6 +79,8 @@ export class HomePage {
       }
     );
   }
+  
+  
 
   openForgotPasswordModal() {
     this.isForgotPasswordModalOpen = true;
