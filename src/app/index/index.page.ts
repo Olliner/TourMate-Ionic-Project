@@ -22,11 +22,15 @@ export class IndexPage implements OnInit, AfterViewInit {
       name: 'Cristo Redentor',
       image: '/assets/images/cristo.jpg', // Substitua pela URL real
       stars: this.getStarRatings(5),
+      latitude: -22.9519,
+      longitude: -43.2105,
     },
     {
       name: 'Pão de Açúcar',
       image: '/assets/images/pao.jpg', // Substitua pela URL real
       stars: this.getStarRatings(4.8),
+      latitude: -22.9486,
+      longitude: -43.1563,
     },
     {
       name: 'Praia de Copacabana',
@@ -44,7 +48,7 @@ export class IndexPage implements OnInit, AfterViewInit {
       stars: this.getStarRatings(4.9),
     },
   ];
-  
+
   recommendedPlaces = [
     {
       name: 'Praia da Joatinga',

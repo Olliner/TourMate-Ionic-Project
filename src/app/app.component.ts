@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { ApiService } from './services/api.service';
 import { Router, NavigationEnd } from '@angular/router';
+import { BehaviorSubject } from 'rxjs'; // Para gerenciamento reativo
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,7 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class AppComponent implements OnInit {
   username: string = ''; // Nome do usuário
-  avatarUrl: string = ''; // URL do avatar
+  avatarUrl$: BehaviorSubject<string> = new BehaviorSubject<string>('/assets/images/avatar.png'); // Avatar reativo
   userId: string = ''; // ID do usuário
   showMenu: boolean = true; // Controla a visibilidade do menu
 
@@ -57,20 +58,22 @@ export class AppComponent implements OnInit {
   private loadUserAvatar() {
     this.apiService.getUserAvatar(this.userId).subscribe(
       (avatarUrl) => {
-        this.avatarUrl = avatarUrl
-          ? `${avatarUrl}?t=${new Date().getTime()}` // Força o navegador a buscar uma nova versão
+        const avatarWithTimestamp = avatarUrl
+          ? `${avatarUrl}?t=${new Date().getTime()}` // Força o navegador a buscar nova versão
           : '/assets/images/avatar.png'; // Avatar padrão
+
+        this.avatarUrl$.next(avatarWithTimestamp); // Atualiza o BehaviorSubject
       },
       (error) => {
         console.error('Erro ao carregar avatar:', error);
-        this.avatarUrl = '/assets/images/avatar.png'; // Fallback para avatar padrão
+        this.avatarUrl$.next('/assets/images/avatar.png'); // Fallback para avatar padrão
       }
     );
   }
 
   private resetUser() {
     this.username = ''; // Limpa o nome do usuário
-    this.avatarUrl = '/assets/images/avatar.png'; // Reseta o avatar para padrão
+    this.avatarUrl$.next('/assets/images/avatar.png'); // Reseta o avatar para padrão
   }
 
   logout() {
@@ -78,5 +81,5 @@ export class AppComponent implements OnInit {
     localStorage.removeItem('userId');
     this.resetUser(); // Reseta o estado do usuário
     this.navCtrl.navigateRoot('/home'); // Redireciona para a página inicial
-  }  
+  }
 }

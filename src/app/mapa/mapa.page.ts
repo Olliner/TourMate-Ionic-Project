@@ -1,7 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ModalController, ToastController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Loader } from '@googlemaps/js-api-loader';
+import { ModalComponentComponent } from '../modal-component/modal-component.component';
 
 @Component({
   selector: 'app-mapa',
@@ -21,29 +23,29 @@ export class MapaPage implements OnInit {
   savedData: any[] = [];
   feedbackMessage: string = '';
 
-  constructor(private route: ActivatedRoute) {} // Adicionado ActivatedRoute para ler os parâmetros da rota
+  constructor(
+    private route: ActivatedRoute,
+    private modalController: ModalController,
+    private toastController: ToastController
+  ) {}
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       const lat = parseFloat(params['lat']);
       const lng = parseFloat(params['lng']);
       const locationName = params['name'];
-  
-      // Inicializa o mapa com o local específico se os parâmetros existirem
+
       if (lat && lng) {
         this.initMap(lat, lng, locationName);
       } else {
-        // Inicializa o mapa com a posição padrão
         this.initMap();
       }
-  
-      // Verifica se o parâmetro "showCard" foi passado
+
       if (params['showCard'] === 'true') {
-        this.isCardVisible = true; // Mostra o card automaticamente
+        this.isCardVisible = true;
       }
     });
   }
-  
 
   initMap(lat?: number, lng?: number, locationName?: string) {
     const loader = new Loader({
@@ -51,18 +53,17 @@ export class MapaPage implements OnInit {
       version: 'weekly',
       libraries: ['places'],
     });
-  
+
     loader.load().then(() => {
-      const center = lat && lng ? { lat, lng } : { lat: -23.55052, lng: -46.633308 }; // Posição padrão para São Paulo
-  
+      const center = lat && lng ? { lat, lng } : { lat: -23.55052, lng: -46.633308 };
+
       const mapOptions: google.maps.MapOptions = {
         center: center,
-        zoom: lat && lng ? 15 : 12, // Aproxima mais se for localização específica
+        zoom: lat && lng ? 15 : 12,
       };
-  
+
       this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-  
-      // Adiciona marcador se coordenadas forem fornecidas
+
       if (lat && lng && locationName) {
         new google.maps.Marker({
           position: { lat, lng },
@@ -72,7 +73,21 @@ export class MapaPage implements OnInit {
       }
     });
   }
-  
+
+  async openModal() {
+    const modal = await this.modalController.create({
+      component: ModalComponentComponent,
+    });
+
+    modal.onDidDismiss().then((result) => {
+      const data = result.data;
+      if (data) {
+        this.initMap(data.lat, data.lng, data.name);
+      }
+    });
+
+    return await modal.present();
+  }
 
   toggleCard() {
     this.isCardVisible = !this.isCardVisible;
@@ -88,7 +103,6 @@ export class MapaPage implements OnInit {
     this.rating = rating;
   }
 
-  // Captura foto usando a câmera
   async capturePhoto() {
     try {
       const photo = await Camera.getPhoto({
@@ -97,11 +111,8 @@ export class MapaPage implements OnInit {
         quality: 90,
       });
 
-      // Verifica se o dataUrl é definido
       if (photo.dataUrl) {
         this.imageSrc = photo.dataUrl;
-      } else {
-        console.error('Foto capturada não contém dataUrl.');
       }
     } catch (error) {
       console.error('Erro ao capturar foto:', error);
@@ -132,10 +143,11 @@ export class MapaPage implements OnInit {
     };
 
     this.savedData.push(data);
-    console.log('Dados salvos:', this.savedData);
-
     this.feedbackMessage = 'Informações salvas com sucesso!';
+    this.resetForm();
+  }
 
+  resetForm() {
     this.locationName = '';
     this.rating = 0;
     this.imageSrc = null;

@@ -3,7 +3,7 @@
     <!-- Avatar e Nome do Usuário -->
     <div class="menu-header">
       <ion-avatar class="menu-avatar">
-        <img alt="User avatar" [src]="avatarUrl || '/assets/images/avatar.png'" />
+        <img alt="User avatar" [src]="avatarUrl$ | async" />
       </ion-avatar>
       <h5 class="user-name">{{ username }}</h5>
     </div>

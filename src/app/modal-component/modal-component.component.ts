@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavController  } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class ModalComponentComponent implements OnInit {
   comment: string = ''; // Comentário do usuário
   rating: number | null = null; // Avaliação selecionada pelo usuário
 
-  constructor(private modalController: ModalController, private apiService: ApiService) {}
+  constructor(private modalController: ModalController, private apiService: ApiService,private navCtrl: NavController) {}
 
   ngOnInit() {
     if (this.location?.name) {
@@ -22,7 +22,18 @@ export class ModalComponentComponent implements OnInit {
   }
 
   async closeModal() {
+    await this.modalController.dismiss(); // Fecha o modal sem enviar dados
+  }
+
+  async goToMap() {
     await this.modalController.dismiss();
+    this.navCtrl.navigateForward('/mapa', {
+      queryParams: {
+        lat: this.location.lat,
+        lng: this.location.lng,
+        name: this.location.name,
+      },
+    });
   }
 
   getComentarios(locationName: string) {
@@ -30,7 +41,7 @@ export class ModalComponentComponent implements OnInit {
       (response: any) => {
         this.comentarios = response || [];
       },
-      error => {
+      (error) => {
         console.error('Erro ao buscar comentários:', error);
       }
     );
@@ -43,23 +54,21 @@ export class ModalComponentComponent implements OnInit {
   submitEvaluation() {
     if (this.comment && this.rating !== null) {
       const evaluation = {
-        location: this.location.name, // Adicione 'location' para atender ao tipo 'Evaluation'
-        locationName: this.location.name, // Preservando para compatibilidade, caso necessário
+        location: this.location.name, // Nome do local
         comment: this.comment,
         rating: this.rating,
       };
-  
+
       this.apiService.submitEvaluation(evaluation).subscribe(
         () => {
           this.comentarios.push(evaluation); // Atualiza os comentários na interface
           this.comment = ''; // Limpa o campo de comentário
           this.rating = null; // Reseta a avaliação
         },
-        error => {
+        (error) => {
           console.error('Erro ao enviar avaliação:', error);
         }
       );
     }
   }
-  
 }

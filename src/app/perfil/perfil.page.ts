@@ -114,7 +114,6 @@ export class PerfilPage implements OnInit {
             if (response && response.avatar_url) {
               this.avatarUrl = `${response.avatar_url}?t=${new Date().getTime()}`;
               this.presentToast('Avatar atualizado com sucesso!');
-              this.loadUserProfile();
             } else {
               this.presentToast('Erro ao atualizar avatar.');
             }
@@ -129,6 +128,7 @@ export class PerfilPage implements OnInit {
     };
     input.click();
   }
+  
 
   async onSubmitEmail() {
     const loading = await this.presentLoading('Atualizando email...');
