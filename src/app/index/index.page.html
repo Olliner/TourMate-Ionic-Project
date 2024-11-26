@@ -8,8 +8,10 @@
   </ion-header>
 
   <ion-content class="ion-padding">
+    <!-- Título de boas-vindas -->
     <ion-title class="welcome-title" style="font-size: 33px;">Bem-Vindo</ion-title>
 
+    <!-- Primeiro carrossel: Conheça sua localização -->
     <ion-title class="section-title">Conheça Sua Localização</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
@@ -37,20 +39,21 @@
       <div class="swiper-pagination"></div>
     </div>
 
-    <ion-title class="section-title">Recomendados</ion-title>
+    <!-- Segundo carrossel: Recomendados -->
+    <ion-title class="section-title">Recomendações</ion-title>
     <div class="swiper-container">
       <div class="swiper-wrapper">
         <div
           class="swiper-slide"
-          *ngFor="let recommendation of recommendedPlaces"
-          (click)="openModal(recommendation)">
+          *ngFor="let location of recommendedPlaces.concat(recommendedLocations, sharedLocations)"
+          (click)="openModal(location)">
           <div class="slide-box">
             <div class="slide-content">
-              <img [src]="recommendation.image" [alt]="recommendation.name" class="location-image"/>
-              <label>{{ recommendation.name }}</label>
+              <img [src]="location.image" [alt]="location.name" class="location-image" />
+              <label>{{ location.name }}</label>
               <div>
                 <img
-                  *ngFor="let star of recommendation.stars"
+                  *ngFor="let star of location.stars"
                   src="/assets/images/avaliação.png"
                   [class.half-opacity]="star.half"
                   alt="avaliação"

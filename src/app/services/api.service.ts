@@ -109,4 +109,24 @@ export class ApiService {
       map(response => response.avatar_url)
     );
   }
+
+  // Adicione este método ao ApiService
+addLocation(file: File, name: string, rating: number, latitude?: number, longitude?: number): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('name', name);
+  formData.append('rating', rating.toString());
+  
+  if (latitude !== undefined) {
+    formData.append('latitude', latitude.toString());
+  }
+  
+  if (longitude !== undefined) {
+    formData.append('longitude', longitude.toString());
+  }
+
+  return this.http.post(`${this.apiUrl}/locations`, formData);
+}
+
+
 }

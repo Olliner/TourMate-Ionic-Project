@@ -20,7 +20,6 @@ export class MapaPage implements OnInit {
   stars: number[] = [1, 2, 3, 4, 5];
   rating: number = 0;
   imageSrc: string | null = null;
-  savedData: any[] = [];
   feedbackMessage: string = '';
 
   constructor(
@@ -49,7 +48,7 @@ export class MapaPage implements OnInit {
 
   initMap(lat?: number, lng?: number, locationName?: string) {
     const loader = new Loader({
-      apiKey: 'AIzaSyBvuqpS3outT1rMHLKy378FcuugHz12DkI',
+      apiKey: 'YOUR_API_KEY',
       version: 'weekly',
       libraries: ['places'],
     });
@@ -72,21 +71,6 @@ export class MapaPage implements OnInit {
         });
       }
     });
-  }
-
-  async openModal() {
-    const modal = await this.modalController.create({
-      component: ModalComponentComponent,
-    });
-
-    modal.onDidDismiss().then((result) => {
-      const data = result.data;
-      if (data) {
-        this.initMap(data.lat, data.lng, data.name);
-      }
-    });
-
-    return await modal.present();
   }
 
   toggleCard() {
@@ -142,7 +126,10 @@ export class MapaPage implements OnInit {
       image: this.imageSrc,
     };
 
-    this.savedData.push(data);
+    const savedLocations = JSON.parse(localStorage.getItem('sharedLocations') || '[]');
+    savedLocations.push(data);
+    localStorage.setItem('sharedLocations', JSON.stringify(savedLocations));
+
     this.feedbackMessage = 'Informações salvas com sucesso!';
     this.resetForm();
   }

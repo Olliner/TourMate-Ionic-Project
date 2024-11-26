@@ -16,67 +16,22 @@ export class IndexPage implements OnInit, AfterViewInit {
   avatarUrl: string = '';
   userId: string = '';
   comentarios: any[] = [];
-
   recommendedLocations = [
-    {
-      name: 'Cristo Redentor',
-      image: '/assets/images/cristo.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(5),
-      latitude: -22.9519,
-      longitude: -43.2105,
-    },
-    {
-      name: 'Pão de Açúcar',
-      image: '/assets/images/pao.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.8),
-      latitude: -22.9486,
-      longitude: -43.1563,
-    },
-    {
-      name: 'Praia de Copacabana',
-      image: '/assets/images/copacabana.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.7),
-    },
-    {
-      name: 'Maracanã',
-      image: '/assets/images/maraca.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.6),
-    },
-    {
-      name: 'Jardim Botânico',
-      image: '/assets/images/jardim.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.9),
-    },
+    { name: 'Cristo Redentor', image: '/assets/images/cristo.jpg', stars: this.getStarRatings(5), latitude: -22.9519, longitude: -43.2105 },
+    { name: 'Pão de Açúcar', image: '/assets/images/pao.jpg', stars: this.getStarRatings(4.8), latitude: -22.9486, longitude: -43.1563 },
+    { name: 'Praia de Copacabana', image: '/assets/images/copacabana.jpg', stars: this.getStarRatings(4.7) },
+    { name: 'Maracanã', image: '/assets/images/maraca.jpg', stars: this.getStarRatings(4.6) },
+    { name: 'Jardim Botânico', image: '/assets/images/jardim.jpg', stars: this.getStarRatings(4.9) },
   ];
-
   recommendedPlaces = [
-    {
-      name: 'Praia da Joatinga',
-      image: '/assets/images/joatinga.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.5),
-    },
-    {
-      name: 'Pedra do Telégrafo',
-      image: '/assets/images/pedra.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.7),
-    },
-    {
-      name: 'Parque Natural da Prainha',
-      image: '/assets/images/prainha.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.8),
-    },
-    {
-      name: 'Mirante Dona Marta',
-      image: '/assets/images/mirante.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.6),
-    },
-    {
-      name: 'Ilha Fiscal',
-      image: '/assets/images/fiscal.jpg', // Substitua pela URL real
-      stars: this.getStarRatings(4.4),
-    },
+    { name: 'Praia da Joatinga', image: '/assets/images/joatinga.jpg', stars: this.getStarRatings(4.5) },
+    { name: 'Pedra do Telégrafo', image: '/assets/images/pedra.jpg', stars: this.getStarRatings(4.7) },
+    { name: 'Parque Natural da Prainha', image: '/assets/images/prainha.jpg', stars: this.getStarRatings(4.8) },
+    { name: 'Mirante Dona Marta', image: '/assets/images/mirante.jpg', stars: this.getStarRatings(4.6) },
+    { name: 'Ilha Fiscal', image: '/assets/images/fiscal.jpg', stars: this.getStarRatings(4.4) },
   ];
-  
+  sharedLocations: any[] = [];
+
   constructor(
     private modalController: ModalController,
     private navCtrl: NavController,
@@ -87,6 +42,7 @@ export class IndexPage implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.loadUserProfile();
+    this.loadSharedLocations();
   }
 
   ngAfterViewInit() {
@@ -111,6 +67,14 @@ export class IndexPage implements OnInit, AfterViewInit {
     }
   }
 
+  private loadSharedLocations() {
+    const sharedLocations = JSON.parse(localStorage.getItem('sharedLocations') || '[]');
+    this.sharedLocations = sharedLocations.map((loc: any) => ({
+      ...loc,
+      stars: this.getStarRatings(loc.rating),
+    }));
+  }
+
   logout() {
     localStorage.removeItem('username');
     localStorage.removeItem('userId');
@@ -125,16 +89,13 @@ export class IndexPage implements OnInit, AfterViewInit {
       slidesPerView: 1,
       spaceBetween: 10,
     };
-
     this.swiper = new Swiper('.swiper-container', swiperOptions);
   }
 
   async openModal(data: any) {
     const modal = await this.modalController.create({
       component: ModalComponentComponent,
-      componentProps: {
-        location: data,
-      },
+      componentProps: { location: data },
     });
     return await modal.present();
   }
@@ -143,10 +104,8 @@ export class IndexPage implements OnInit, AfterViewInit {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
     const stars = Array(fullStars).fill({ half: false });
-
     if (halfStar) stars.push({ half: true });
     while (stars.length < 5) stars.push({ half: true });
-
     return stars;
   }
 }
