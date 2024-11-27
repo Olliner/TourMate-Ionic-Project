@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { NavController, ModalController, ToastController } from '@ionic/angular';
+import { NavController, ToastController } from '@ionic/angular';
 
 enum PasswordResetState {
   RequestEmail = 'RequestEmail',
@@ -14,25 +14,29 @@ enum PasswordResetState {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  PasswordResetState = PasswordResetState;
-  passwordResetState: PasswordResetState = PasswordResetState.RequestEmail;
-
+  // Atributos de login
   nome: string = '';
   senha: string = '';
+  avatarUrl: string = '/assets/images/avatar.png';
+
+  // Atributos de redefinição de senha
+  PasswordResetState = PasswordResetState;
+  passwordResetState: PasswordResetState = PasswordResetState.RequestEmail;
   email: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
   token: string = '';
   isForgotPasswordModalOpen: boolean = false;
-  avatarUrl: string = '/assets/images/avatar.png';
-
 
   constructor(
     private apiService: ApiService,
     private navCtrl: NavController,
-    private modalCtrl: ModalController,
     private toastCtrl: ToastController
   ) {}
+
+  ngOnInit() {
+    this.checkLoginState();
+  }
 
   async presentToast(message: string, duration: number = 2000) {
     const toast = await this.toastCtrl.create({
@@ -43,32 +47,34 @@ export class HomePage {
     toast.present();
   }
 
+  checkLoginState() {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.navCtrl.navigateForward('/index');
+    }
+  }
+
   login() {
     if (!this.nome || !this.senha) {
       this.presentToast('Por favor, preencha todos os campos.');
       return;
     }
+
     this.apiService.login(this.nome, this.senha).subscribe(
       (response: any) => {
         if (response && response.id) {
+          // Armazenar no localStorage
           localStorage.setItem('username', response.nome);
           localStorage.setItem('userId', response.id);
-  
-          // Atualizar avatar e nome no AppComponent
-          this.apiService.getUserProfile(response.id).subscribe((user) => {
-            this.apiService.getUserAvatar(response.id).subscribe((avatarUrl) => {
-              this.avatarUrl = avatarUrl
-                ? `${avatarUrl}?t=${new Date().getTime()}`
-                : '/assets/images/avatar.png';
-            });
+
+          this.apiService.getUserAvatar(response.id).subscribe((avatarUrl) => {
+            this.avatarUrl = avatarUrl
+              ? `${avatarUrl}?t=${new Date().getTime()}`
+              : '/assets/images/avatar.png';
           });
-  
+
           this.presentToast('Login bem-sucedido!');
-          
-          // Navegar e recarregar a página
-          this.navCtrl.navigateForward('/index').then(() => {
-            location.reload(); // Recarrega a página após navegação
-          });
+          this.navCtrl.navigateForward('/index');
         } else {
           this.presentToast('Erro no login: dados de usuário não encontrados.');
         }
@@ -79,9 +85,8 @@ export class HomePage {
       }
     );
   }
-  
-  
 
+  // Funções para modal de redefinição de senha
   openForgotPasswordModal() {
     this.isForgotPasswordModalOpen = true;
     this.passwordResetState = PasswordResetState.RequestEmail;

@@ -21,6 +21,7 @@ export class MapaPage implements OnInit {
   rating: number = 0;
   imageSrc: string | null = null;
   feedbackMessage: string = '';
+  sharedLocations: any[] = []; // Adicionado
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +35,7 @@ export class MapaPage implements OnInit {
       const lng = parseFloat(params['lng']);
       const locationName = params['name'];
 
-      if (lat && lng) {
+      if (!isNaN(lat) && !isNaN(lng)) {
         this.initMap(lat, lng, locationName);
       } else {
         this.initMap();
@@ -44,6 +45,16 @@ export class MapaPage implements OnInit {
         this.isCardVisible = true;
       }
     });
+    this.updateSharedLocations();
+  }
+
+  async showToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom',
+    });
+    toast.present();
   }
 
   initMap(lat?: number, lng?: number, locationName?: string) {
@@ -116,7 +127,7 @@ export class MapaPage implements OnInit {
 
   saveData() {
     if (!this.locationName || this.rating === 0) {
-      this.feedbackMessage = 'Por favor, preencha todas as informações antes de salvar.';
+      this.showToast('Por favor, preencha todas as informações antes de salvar.');
       return;
     }
 
@@ -130,13 +141,20 @@ export class MapaPage implements OnInit {
     savedLocations.push(data);
     localStorage.setItem('sharedLocations', JSON.stringify(savedLocations));
 
-    this.feedbackMessage = 'Informações salvas com sucesso!';
+    this.updateSharedLocations();
+    this.showToast('Informações salvas com sucesso!');
     this.resetForm();
+  }
+
+  updateSharedLocations() {
+    const sharedLocations = JSON.parse(localStorage.getItem('sharedLocations') || '[]');
+    this.sharedLocations = sharedLocations;
   }
 
   resetForm() {
     this.locationName = '';
     this.rating = 0;
     this.imageSrc = null;
+    this.feedbackMessage = '';
   }
 }

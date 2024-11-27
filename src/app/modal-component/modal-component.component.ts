@@ -26,15 +26,17 @@ export class ModalComponentComponent implements OnInit {
   }
 
   async goToMap() {
-    await this.modalController.dismiss();
-    this.navCtrl.navigateForward('/mapa', {
-      queryParams: {
-        lat: this.location.lat,
-        lng: this.location.lng,
-        name: this.location.name,
-      },
-    });
+    const latitude = this.location.latitude;
+    const longitude = this.location.longitude;
+  
+    if (latitude && longitude) {
+      const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      window.open(googleMapsUrl, '_blank'); // Abre o Google Maps em uma nova aba
+    } else {
+      console.error('Coordenadas inválidas para abrir o mapa.');
+    }
   }
+  
 
   getComentarios(locationName: string) {
     this.apiService.getEvaluations(locationName).subscribe(

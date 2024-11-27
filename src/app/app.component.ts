@@ -31,6 +31,16 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.checkLoginStatus(); // Verifica se o usuário está logado
+    this.redirectToAppropriatePage();
+  }
+  
+  redirectToAppropriatePage() {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.navCtrl.navigateRoot('/index');
+    } else {
+      this.navCtrl.navigateRoot('/home');
+    }
   }
 
   private checkLoginStatus() {
@@ -41,6 +51,7 @@ export class AppComponent implements OnInit {
       this.resetUser(); // Reseta o usuário para estado inicial
     }
   }
+
 
   private loadUserProfile() {
     this.apiService.getUserProfile(this.userId).subscribe(
